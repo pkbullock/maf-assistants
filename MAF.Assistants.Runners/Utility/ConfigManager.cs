@@ -14,6 +14,13 @@ namespace MAF.Assistants.Utility
             string OllamaLocalEmbeddingModelName
          );
 
+        /// <summary>
+        /// Gets the configuration settings
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Usage: ConfigManager.GetConfig().AzureOpenAiEndpoint
+        /// </remarks>
         public static Configuration GetConfig()
         {
             IConfigurationRoot configurationRoot = new ConfigurationBuilder().AddUserSecrets<ConfigManager>().Build();

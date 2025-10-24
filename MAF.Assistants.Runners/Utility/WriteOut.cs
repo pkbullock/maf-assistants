@@ -46,12 +46,18 @@ namespace MAF.Assistants.Utility
             Divider();
             MsgGreen("Press any key to exit...");
             Console.ReadKey();
-
         }
 
-        public static void Divider()
+        /// <summary>
+        /// Creates a divider line across the console window
+        /// </summary>
+        public static void Divider(bool noNewLine = false)
         {
-            Console.WriteLine("--------------------------------------------------");
+            if (!noNewLine)
+            {
+                Console.WriteLine();
+            }
+            Console.WriteLine("".PadLeft(Console.WindowWidth, '-'));
         }
     }
 }
