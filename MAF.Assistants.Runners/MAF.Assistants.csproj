@@ -5,13 +5,20 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>fb58d561-37a0-42fe-a2b1-879bd693fe8d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Agents\" />
     <Folder Include="Services\" />
     <Folder Include="Tools\" />
-    <Folder Include="Runners\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.5.0-beta.1" />
+    <PackageReference Include="Azure.Identity" Version="1.17.0" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251016.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
 
 </Project>
