@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenAI;
+using OpenAI.Chat;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Interfaces
 {
-    internal interface ProcessRunners
+    internal interface RunModel
     {
         /// <summary>
-        /// Start the process runner and entry point for the application
+        /// Entry point to start a model process
         /// </summary>
-        static abstract Task Start<T>() where T : RunModel, new();
+        abstract Task StartAsync(ChatClient client);
     }
 }

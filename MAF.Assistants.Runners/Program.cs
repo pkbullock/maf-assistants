@@ -16,11 +16,13 @@ namespace MAF.Assistants
             WriteOut.Divider(true);
 
             //LocalProcess.Start();
-            //AzureOpenAIProcess.Start();
+            
+            //await AzureClient.Start<SimpleChat>();
+            await LocalClient.Start<SimpleChat>();
 
             // Temp, just get started with processing something.
-            SimpleChat chat = new SimpleChat();
-            await chat.StartAsync();
+            //SimpleChat chat = new SimpleChat();
+            //await chat.StartAsync();
 
 
             //End of program
