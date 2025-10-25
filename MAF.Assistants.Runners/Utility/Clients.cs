@@ -108,6 +108,16 @@ namespace MAF.Assistants.Utility
             return chatClient;
         }
 
+        public static void BlockLocalFoundryChatNotSupported(ChatClient client)
+        {
+#pragma warning disable OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            if (client.Model == ConfigManager.GetConfig().FoundryLocalChatDeploymentName)
+            {
+                throw new InvalidOperationException("The provided ChatClient is not supported for the local Foundry chat deployment.");
+            }
+#pragma warning restore OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        }
+        
 
         public static void OpenAI()
         {
@@ -118,5 +128,8 @@ namespace MAF.Assistants.Utility
 
             throw new NotImplementedException();
         } 
+
+
+
     }
 }

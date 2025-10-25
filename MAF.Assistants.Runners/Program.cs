@@ -16,10 +16,12 @@ namespace MAF.Assistants
             WriteOut.Divider(true);
 
             //LocalProcess.Start();
-            
-            await AzureClient.StartChat<SimpleChat>();
+
+            //await AzureClient.StartChat<SimpleChat>();
             //await LocalClient.Start<SimpleChat>();
 
+            //await AzureClient.StartChat<SimpleChatWithTools>();
+            await LocalClient.StartChat<SimpleChatWithTools>();
 
 
             // Temp, just get started with processing something.

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Runners
 {
-    internal class SimpleChat: RunChatModel
+    internal class SimpleChatWithThread: RunChatModel
     {
         public async Task StartAsync(ChatClient client)
         {
