@@ -46,3 +46,5 @@ Library for Microsoft Agent Framework Assistants
 - Microsoft 365 Agents SDK - https://github.com/microsoft/Agents
 - Microsoft Copilot Studio - https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio?WT.mc_id=M365-MVP-5003816
 - Microsoft 365 Agents SDK documentation - https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/?WT.mc_id=M365-MVP-5003816
+- Windows-DevRel - https://github.com/microsoft/Windows-DevRel
+- Context-Aware RAG and Chunking - https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/context-aware-rag-system-with-azure-ai-search-to-cut-token-costs-and-boost-accur/4456810
