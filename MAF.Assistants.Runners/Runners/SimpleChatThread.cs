@@ -1,4 +1,5 @@
 ﻿using Azure.AI.OpenAI;
+using MAF.Assistants.Abstract;
 using MAF.Assistants.Interfaces;
 using MAF.Assistants.Utility;
 using Microsoft.Agents.AI;
@@ -14,8 +15,9 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Runners
 {
-    internal class SimpleChatWithThread: RunChatModel
+    internal class SimpleChatWithThread: BaseChat, RunChatModel
     {
+        
         public async Task StartAsync(ChatClient client)
         {
             WriteOut.MsgCyan("Starting Simple Chat...");

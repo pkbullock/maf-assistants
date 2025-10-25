@@ -1,4 +1,4 @@
-# Introduction
+﻿# Introduction
 
 Library for Microsoft Agent Framework Assistants
 
@@ -15,7 +15,7 @@ Library for Microsoft Agent Framework Assistants
     - Trigger Copilot Studio Agent
     - Trigger AI Foundry Agent
     - Invoke a Logic App (keeps the agent flexible)
-    - Invoke a local GPT model (offline fallback)
+    - ✅ Invoke a local GPT model (offline fallback)
     - Invoke a local Whisper model (NPU)
     - Invoke a local vision model to read document page
     - Shorten Text for Social Media
@@ -23,7 +23,7 @@ Library for Microsoft Agent Framework Assistants
     - Get Date
     - AUthenticate to Microsoft 365 (User)
     - Opens a URL in Edge
-- Agent to Agent
+- Agent to Agent (Microsoft 365 SDK)
     - Handoff to Copilot Studio Agent
     - Handoff to Azure AI Foundry Agent
 
@@ -48,3 +48,14 @@ Library for Microsoft Agent Framework Assistants
 - Microsoft 365 Agents SDK documentation - https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/?WT.mc_id=M365-MVP-5003816
 - Windows-DevRel - https://github.com/microsoft/Windows-DevRel
 - Context-Aware RAG and Chunking - https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/context-aware-rag-system-with-azure-ai-search-to-cut-token-costs-and-boost-accur/4456810
+- Hugging Face  - all-MiniLM-L6-v2 - https://huggingface.co/optimum/all-MiniLM-L6-v2
+
+
+## Local Models
+
+The Phi-3 model range does not support tool calling. 
+
+- "FoundryLocalChatDeploymentName": "phi-3.5-mini-128k-instruct-qnn-npu:2",
+- "FoundryLocalChatDeploymentName": "Phi-4-mini-instruct-generic-cpu:4",
+
+Enabling Functiona Calling with Phi-4 requires this change: https://github.com/microsoft/Foundry-Local/tree/main/samples/python/functioncalling

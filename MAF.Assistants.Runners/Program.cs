@@ -20,8 +20,8 @@ namespace MAF.Assistants
             //await AzureClient.StartChat<SimpleChat>();
             //await LocalClient.Start<SimpleChat>();
 
-            //await AzureClient.StartChat<SimpleChatWithTools>();
-            await LocalClient.StartChat<SimpleChatWithTools>();
+            await AzureClient.StartChat<SimpleChatWithTools>();
+            //await LocalClient.StartChat<SimpleChatWithTools>();
 
 
             // Temp, just get started with processing something.

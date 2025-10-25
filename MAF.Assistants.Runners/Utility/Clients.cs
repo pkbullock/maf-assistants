@@ -55,7 +55,7 @@ namespace MAF.Assistants.Utility
         /// integration currently has limitations with the <see cref="OpenAIClient"/>, such as the inability to
         /// configure  maximum token limits or temperature settings. </para></remarks>
         /// <returns>An <see cref="OpenAIClient"/> instance configured to interact with the locally hosted Foundry model.</returns>
-        public static OpenAIClient LocalFoundry()
+        public static OpenAIClient LocalFoundry(bool requiresTools = false)
         {
             // Placeholder for starting local process logic
             WriteOut.Msg("Starting local process...");
@@ -78,6 +78,12 @@ namespace MAF.Assistants.Utility
             WriteOut.Msg("Model ID: " + model?.ModelId);
             WriteOut.Msg("Model Alias: " + model?.Alias);
             WriteOut.Msg("Model Supports Tools: " + model?.SupportsToolCalling.ToString());
+            
+            if(requiresTools && !(model?.SupportsToolCalling ?? false))
+            {
+                WriteOut.MsgGrey("!Warning - The selected local Foundry model does not support tool calling, which is required.");
+            }
+
             WriteOut.Divider();
 
             ApiKeyCredential key = new ApiKeyCredential(manager.ApiKey);
@@ -100,9 +106,9 @@ namespace MAF.Assistants.Utility
         /// in the  configuration to initialize the chat client. Ensure that the configuration contains a valid 
         /// deployment name for the local Foundry chat service.</remarks>
         /// <returns>A <see cref="ChatClient"/> instance connected to the local Foundry chat deployment.</returns>
-        public static ChatClient GetLocalFoundryChat()
+        public static ChatClient GetLocalFoundryChat(bool requiresTools = false)
         {
-            var client = LocalFoundry();
+            var client = LocalFoundry(requiresTools);
             var modelId = ConfigManager.GetConfig().FoundryLocalChatDeploymentName;
             ChatClient chatClient = client.GetChatClient(modelId);
             return chatClient;
@@ -127,9 +133,18 @@ namespace MAF.Assistants.Utility
         public static void Ollama() {
 
             throw new NotImplementedException();
-        } 
+        }
 
+        public class RunOptions
+        {
+            //, RunOptions? options = null
+            public bool RequiresTools { get; init; }
 
+            public RunOptions(bool requiresTools = true)
+            {
+                RequiresTools = requiresTools;
+            }
 
+        }
     }
 }

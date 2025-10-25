@@ -26,10 +26,11 @@ namespace MAF.Assistants.Runners
         /// </summary>
         public static Task StartChat<T>() where T : RunChatModel, new()
         {
-           
-            ChatClient chatClient = Clients.GetLocalFoundryChat();
 
             var modelInstance = new T();
+
+            ChatClient chatClient = Clients.GetLocalFoundryChat(modelInstance.RequiresTools);
+                        
             return modelInstance.StartAsync(chatClient);
         }
 

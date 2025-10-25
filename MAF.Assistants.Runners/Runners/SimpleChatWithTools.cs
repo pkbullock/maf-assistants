@@ -1,5 +1,7 @@
 ﻿using Azure.AI.OpenAI;
+using MAF.Assistants.Abstract;
 using MAF.Assistants.Interfaces;
+using MAF.Assistants.Middleware;
 using MAF.Assistants.Utility;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -15,13 +17,17 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Runners
 {
-    internal class SimpleChatWithTools : RunChatModel
+    internal class SimpleChatWithTools : BaseChat, RunChatModel
     {
+        
+        public SimpleChatWithTools() {
+            RequiresTools = true;
+        }
+        
         public async Task StartAsync(ChatClient client)
         {
-
             //Note this doesnt work with local foundry yet, this is a limitation of the model used
-            Clients.BlockLocalFoundryChatNotSupported(client);
+            
 
             WriteOut.MsgCyan("Starting Simple Chat with Tools...");
             WriteOut.MsgBlankLine();
@@ -30,7 +36,11 @@ namespace MAF.Assistants.Runners
             string agentName = "WeatherAI";
             string prompt = "What is the weather like in Amsterdam?";
 
-            AIAgent agent = client.CreateAIAgent(instructions: modelInstruction, name: agentName, tools: [AIFunctionFactory.Create(GetWeather)]);
+            AIAgent agent = client.CreateAIAgent(instructions: modelInstruction, name: agentName, 
+                tools: [AIFunctionFactory.Create(GetWeather, "get_weather", "Gets the current weather for a specified location")])
+                .AsBuilder()
+                .Use(LogFunctionCalling.LogFunctionCallAsync)
+                .Build();
 
             // Simple Example - Streaming
             // TODO: Move away from console.writeline and use the WriteOut utility class

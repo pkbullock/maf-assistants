@@ -9,9 +9,18 @@ namespace MAF.Assistants.Utility
     internal class WriteOut
     {
 
-        public static void Msg(string input)
+        public static void Msg(string input, ConsoleColor? color = null)
         {
-            Console.WriteLine(input);
+            if(color.HasValue)
+            {
+                Console.ForegroundColor = color.Value;
+                Console.WriteLine(input);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.WriteLine(input);
+            }    
         }
 
         public static void MsgBlankLine()
@@ -21,24 +30,23 @@ namespace MAF.Assistants.Utility
 
         public static void MsgGrey(string input)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(input);
-            Console.ResetColor();
+            Msg(input, ConsoleColor.DarkGray);
         }
 
         public static void MsgCyan(string input)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(input);
-            Console.ResetColor();
+            Msg(input, ConsoleColor.Cyan);
         }
 
 
         public static void MsgGreen(string input)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(input);
-            Console.ResetColor();
+            Msg(input, ConsoleColor.Green);
+        }
+
+        public static void MsgYellow(string input)
+        {
+            Msg(input, ConsoleColor.Yellow);
         }
 
         public static void EndOfProgram()
