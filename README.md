@@ -37,3 +37,12 @@ Library for Microsoft Agent Framework Assistants
 ## Build a front end for MAF Chat
 
 - Blazor App
+
+
+## Useful Resources
+
+- Microsoft Agent Framework Documentation - https://learn.microsoft.com/en-us/ai/agent-framework/
+- Microsoft 365 Agents SDK for dotnet - https://github.com/microsoft/Agents-for-net
+- Microsoft 365 Agents SDK - https://github.com/microsoft/Agents
+- Microsoft Copilot Studio - https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio?WT.mc_id=M365-MVP-5003816
+- Microsoft 365 Agents SDK documentation - https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/?WT.mc_id=M365-MVP-5003816
