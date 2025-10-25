@@ -21,12 +21,9 @@ namespace MAF.Assistants.Runners
         /// Start the Azure OpenAI process runner and entry point for the application
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public static Task Start<T>() where T : RunModel, new()
+        public static Task StartChat<T>() where T : RunChatModel, new()
         {
-            AzureOpenAIClient client = new AzureOpenAIClient(new Uri(ConfigManager.GetConfig().AzureOpenAiEndpoint),
-                new ApiKeyCredential(ConfigManager.GetConfig().AzureOpenAiKey));
-
-            ChatClient chatClient = client.GetChatClient(ConfigManager.GetConfig().AzureChatDeploymentName);
+            ChatClient chatClient = Clients.GetAzureChat();
 
             var model = new T();
             return model.StartAsync(chatClient);

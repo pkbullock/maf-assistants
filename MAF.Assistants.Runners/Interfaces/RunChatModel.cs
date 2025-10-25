@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Interfaces
 {
-    internal interface RunModel
+    internal interface RunChatModel
     {
         /// <summary>
         /// Entry point to start a model process

@@ -11,6 +11,6 @@ namespace MAF.Assistants.Interfaces
         /// <summary>
         /// Start the process runner and entry point for the application
         /// </summary>
-        static abstract Task Start<T>() where T : RunModel, new();
+        static abstract Task StartChat<T>() where T : RunChatModel, new();
     }
 }

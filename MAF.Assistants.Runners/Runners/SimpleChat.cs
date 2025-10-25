@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Runners
 {
-    internal class SimpleChat: RunModel
+    internal class SimpleChat: RunChatModel
     {
         public async Task StartAsync(ChatClient client)
         {
@@ -29,9 +29,9 @@ namespace MAF.Assistants.Runners
 
             // Simple Example - Streaming
             // TODO: Move away from console.writeline and use the WriteOut utility class
-            Console.WriteLine(await agent.RunAsync(prompt));
+            //Console.WriteLine(await agent.RunAsync(prompt));
 
-            await foreach (var update in agent.RunStreamingAsync("Tell me a joke about a pirate."))
+            await foreach (var update in agent.RunStreamingAsync(prompt))
             {
                 Console.Write(update);
             }

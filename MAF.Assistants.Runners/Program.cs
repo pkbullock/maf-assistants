@@ -12,13 +12,15 @@ namespace MAF.Assistants
         private static async Task Main(string[] args)
         {
             Console.Clear();
-            Console.WriteLine("Hello, Please Select the Help you need!");
+            Console.WriteLine("Hello, Starting application!");
             WriteOut.Divider(true);
 
             //LocalProcess.Start();
             
-            //await AzureClient.Start<SimpleChat>();
-            await LocalClient.Start<SimpleChat>();
+            await AzureClient.StartChat<SimpleChat>();
+            //await LocalClient.Start<SimpleChat>();
+
+
 
             // Temp, just get started with processing something.
             //SimpleChat chat = new SimpleChat();
