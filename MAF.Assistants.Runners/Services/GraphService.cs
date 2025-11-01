@@ -9,33 +9,57 @@ namespace MAF.Assistants.Services
 {
     /// <summary>
     /// Base service for Microsoft Graph operations with authentication and connection management.
+    /// Supports both application (client credentials) and delegated (user) authentication.
     /// </summary>
     public class GraphService
     {
         private readonly GraphServiceClient _graphClient;
         private readonly int _maxItems;
+        private readonly bool _useDelegatedAuth;
 
         /// <summary>
         /// Initializes a new instance of the GraphService with authentication.
+        /// Uses application credentials by default, or delegated auth if configured.
         /// </summary>
         public GraphService()
         {
             var config = ConfigManager.GetConfig();
             _maxItems = config.MicrosoftGraphMaxItems;
+            _useDelegatedAuth = config.MicrosoftGraphUseDelegatedAuth;
 
             if (string.IsNullOrEmpty(config.MicrosoftGraphTenantId) ||
-                string.IsNullOrEmpty(config.MicrosoftGraphClientId) ||
-                string.IsNullOrEmpty(config.MicrosoftGraphClientSecret))
+                string.IsNullOrEmpty(config.MicrosoftGraphClientId))
             {
-                throw new InvalidOperationException("Microsoft Graph configuration is missing. Please configure MicrosoftGraphTenantId, MicrosoftGraphClientId, and MicrosoftGraphClientSecret.");
+                throw new InvalidOperationException("Microsoft Graph configuration is missing. Please configure MicrosoftGraphTenantId and MicrosoftGraphClientId.");
             }
 
-            var clientSecretCredential = new ClientSecretCredential(
-                config.MicrosoftGraphTenantId,
-                config.MicrosoftGraphClientId,
-                config.MicrosoftGraphClientSecret);
+            if (_useDelegatedAuth)
+            {
+                // Delegated authentication (user context) using Interactive Browser
+                var interactiveBrowserCredential = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = config.MicrosoftGraphTenantId,
+                    ClientId = config.MicrosoftGraphClientId,
+                    RedirectUri = new Uri(config.MicrosoftGraphRedirectUri)
+                });
 
-            _graphClient = new GraphServiceClient(clientSecretCredential);
+                _graphClient = new GraphServiceClient(interactiveBrowserCredential);
+            }
+            else
+            {
+                // Application authentication (app-only context)
+                if (string.IsNullOrEmpty(config.MicrosoftGraphClientSecret))
+                {
+                    throw new InvalidOperationException("Microsoft Graph configuration is missing MicrosoftGraphClientSecret for application authentication.");
+                }
+
+                var clientSecretCredential = new ClientSecretCredential(
+                    config.MicrosoftGraphTenantId,
+                    config.MicrosoftGraphClientId,
+                    config.MicrosoftGraphClientSecret);
+
+                _graphClient = new GraphServiceClient(clientSecretCredential);
+            }
         }
 
         /// <summary>
@@ -47,6 +71,11 @@ namespace MAF.Assistants.Services
         /// Gets the maximum number of items to retrieve in a single operation.
         /// </summary>
         protected int MaxItems => _maxItems;
+
+        /// <summary>
+        /// Gets whether the service is using delegated (user) authentication.
+        /// </summary>
+        public bool IsUsingDelegatedAuth => _useDelegatedAuth;
 
         /// <summary>
         /// Tests the connection to Microsoft Graph by retrieving the organization details.

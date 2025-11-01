@@ -132,5 +132,127 @@ namespace MAF.Assistants.Services
             var folders = await GraphClient.Users[userPrincipalName].MailFolders.GetAsync();
             return folders?.Value?.ToList() ?? new List<MailFolder>();
         }
+
+        /// <summary>
+        /// Gets attachments from an email message.
+        /// </summary>
+        /// <param name="userPrincipalName">The user's email address or UPN.</param>
+        /// <param name="messageId">The message ID.</param>
+        /// <returns>List of attachments.</returns>
+        public async Task<List<Attachment>> GetAttachmentsAsync(string userPrincipalName, string messageId)
+        {
+            var attachments = await GraphClient.Users[userPrincipalName].Messages[messageId].Attachments.GetAsync();
+            return attachments?.Value?.ToList() ?? new List<Attachment>();
+        }
+
+        /// <summary>
+        /// Gets a specific attachment's content.
+        /// </summary>
+        /// <param name="userPrincipalName">The user's email address or UPN.</param>
+        /// <param name="messageId">The message ID.</param>
+        /// <param name="attachmentId">The attachment ID.</param>
+        /// <returns>The attachment object with content.</returns>
+        public async Task<Attachment?> GetAttachmentByIdAsync(string userPrincipalName, string messageId, string attachmentId)
+        {
+            return await GraphClient.Users[userPrincipalName].Messages[messageId].Attachments[attachmentId].GetAsync();
+        }
+
+        /// <summary>
+        /// Sends an email with attachments.
+        /// </summary>
+        /// <param name="userPrincipalName">The user's email address or UPN (sender).</param>
+        /// <param name="toRecipients">List of recipient email addresses.</param>
+        /// <param name="subject">Email subject.</param>
+        /// <param name="body">Email body content.</param>
+        /// <param name="attachments">List of file attachments (name, content bytes).</param>
+        /// <param name="isHtml">Whether the body is HTML (default: false).</param>
+        /// <returns>Task representing the async operation.</returns>
+        public async Task SendEmailWithAttachmentsAsync(
+            string userPrincipalName, 
+            List<string> toRecipients, 
+            string subject, 
+            string body, 
+            List<(string Name, byte[] Content)> attachments,
+            bool isHtml = false)
+        {
+            var message = new Message
+            {
+                Subject = subject,
+                Body = new ItemBody
+                {
+                    ContentType = isHtml ? BodyType.Html : BodyType.Text,
+                    Content = body
+                },
+                ToRecipients = toRecipients.Select(email => new Recipient
+                {
+                    EmailAddress = new EmailAddress
+                    {
+                        Address = email
+                    }
+                }).ToList(),
+                Attachments = attachments.Select(att => new FileAttachment
+                {
+                    Name = att.Name,
+                    ContentBytes = att.Content
+                } as Attachment).ToList()
+            };
+
+            var requestBody = new SendMailPostRequestBody
+            {
+                Message = message,
+                SaveToSentItems = true
+            };
+
+            await GraphClient.Users[userPrincipalName].SendMail.PostAsync(requestBody);
+        }
+
+        /// <summary>
+        /// Sends an HTML email with inline images.
+        /// </summary>
+        /// <param name="userPrincipalName">The user's email address or UPN (sender).</param>
+        /// <param name="toRecipients">List of recipient email addresses.</param>
+        /// <param name="subject">Email subject.</param>
+        /// <param name="htmlBody">HTML body content with &lt;img&gt; tags referencing contentId.</param>
+        /// <param name="inlineImages">List of inline images (contentId, name, content bytes).</param>
+        /// <returns>Task representing the async operation.</returns>
+        public async Task SendHtmlEmailWithInlineImagesAsync(
+            string userPrincipalName,
+            List<string> toRecipients,
+            string subject,
+            string htmlBody,
+            List<(string ContentId, string Name, byte[] Content)> inlineImages)
+        {
+            var message = new Message
+            {
+                Subject = subject,
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Html,
+                    Content = htmlBody
+                },
+                ToRecipients = toRecipients.Select(email => new Recipient
+                {
+                    EmailAddress = new EmailAddress
+                    {
+                        Address = email
+                    }
+                }).ToList(),
+                Attachments = inlineImages.Select(img => new FileAttachment
+                {
+                    Name = img.Name,
+                    ContentId = img.ContentId,
+                    ContentBytes = img.Content,
+                    IsInline = true
+                } as Attachment).ToList()
+            };
+
+            var requestBody = new SendMailPostRequestBody
+            {
+                Message = message,
+                SaveToSentItems = true
+            };
+
+            await GraphClient.Users[userPrincipalName].SendMail.PostAsync(requestBody);
+        }
     }
 }

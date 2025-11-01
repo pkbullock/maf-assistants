@@ -19,7 +19,13 @@ namespace MAF.Assistants.Middleware
             "SendEmail",
             "WriteSharePointFile",
             "send_email",
-            "write_sharepoint_file"
+            "write_sharepoint_file",
+            "SendTeamsMessage",
+            "send_teams_message",
+            "UploadToOneDrive",
+            "upload_to_onedrive",
+            "CreatePlannerTask",
+            "create_planner_task"
         };
 
         /// <summary>

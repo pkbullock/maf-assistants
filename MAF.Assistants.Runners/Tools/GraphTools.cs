@@ -220,5 +220,198 @@ namespace MAF.Assistants.Tools
                 return false;
             }
         }
+
+        // New services for extended capabilities
+        private static readonly TeamsService _teamsService = new TeamsService();
+        private static readonly OneDriveService _oneDriveService = new OneDriveService();
+        private static readonly PlannerService _plannerService = new PlannerService();
+
+        /// <summary>
+        /// Lists Microsoft Teams that the user is a member of.
+        /// </summary>
+        /// <param name="maxTeams">Maximum number of teams to retrieve (default: 10).</param>
+        /// <returns>A summary of Teams.</returns>
+        [Description("Lists Microsoft Teams that the user is a member of.")]
+        public static async Task<string> ListTeams([Description("Maximum number of teams to retrieve")] int maxTeams = 10)
+        {
+            try
+            {
+                var summary = await _teamsService.GetTeamsSummaryAsync(maxTeams);
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error listing teams: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Gets recent messages from a Teams channel.
+        /// </summary>
+        /// <param name="teamId">The team ID.</param>
+        /// <param name="channelId">The channel ID.</param>
+        /// <param name="maxMessages">Maximum number of messages to retrieve (default: 20).</param>
+        /// <returns>A summary of channel messages.</returns>
+        [Description("Gets recent messages from a Microsoft Teams channel.")]
+        public static async Task<string> GetTeamsChannelMessages(
+            [Description("The team ID")] string teamId,
+            [Description("The channel ID")] string channelId,
+            [Description("Maximum number of messages to retrieve")] int maxMessages = 20)
+        {
+            try
+            {
+                var summary = await _teamsService.GetChannelMessagesSummaryAsync(teamId, channelId, maxMessages);
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error getting channel messages: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Sends a message to a Teams channel.
+        /// </summary>
+        /// <param name="teamId">The team ID.</param>
+        /// <param name="channelId">The channel ID.</param>
+        /// <param name="message">The message to send.</param>
+        /// <returns>Confirmation message.</returns>
+        [Description("Sends a message to a Microsoft Teams channel. Requires human confirmation.")]
+        public static async Task<string> SendTeamsMessage(
+            [Description("The team ID")] string teamId,
+            [Description("The channel ID")] string channelId,
+            [Description("The message to send")] string message)
+        {
+            try
+            {
+                var result = await _teamsService.SendChannelMessageAsync(teamId, channelId, message);
+                return result?.Id != null ? $"Message sent successfully. ID: {result.Id}" : "Failed to send message.";
+            }
+            catch (Exception ex)
+            {
+                return $"Error sending Teams message: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Lists files in the user's OneDrive.
+        /// </summary>
+        /// <param name="maxFiles">Maximum number of files to retrieve (default: 20).</param>
+        /// <returns>A summary of OneDrive files.</returns>
+        [Description("Lists files in the user's OneDrive root folder.")]
+        public static async Task<string> ListOneDriveFiles([Description("Maximum number of files to retrieve")] int maxFiles = 20)
+        {
+            try
+            {
+                var summary = await _oneDriveService.GetFilesSummaryAsync("me", maxFiles);
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error listing OneDrive files: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Reads content from a OneDrive file.
+        /// </summary>
+        /// <param name="itemId">The file item ID.</param>
+        /// <returns>The file content.</returns>
+        [Description("Reads the content of a text file from OneDrive.")]
+        public static async Task<string> ReadOneDriveFile([Description("The file item ID")] string itemId)
+        {
+            try
+            {
+                var content = await _oneDriveService.GetFileContentAsync("me", itemId);
+                return string.IsNullOrEmpty(content) ? "File is empty or could not be read." : content;
+            }
+            catch (Exception ex)
+            {
+                return $"Error reading OneDrive file: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Uploads a file to OneDrive.
+        /// </summary>
+        /// <param name="fileName">The name of the file to create.</param>
+        /// <param name="content">The file content.</param>
+        /// <returns>Confirmation message.</returns>
+        [Description("Uploads a text file to OneDrive. Requires human confirmation.")]
+        public static async Task<string> UploadToOneDrive(
+            [Description("The name of the file to create")] string fileName,
+            [Description("The file content")] string content)
+        {
+            try
+            {
+                var item = await _oneDriveService.UploadFileAsync("me", fileName, content);
+                return $"Successfully uploaded file '{fileName}' to OneDrive. Item ID: {item?.Id}";
+            }
+            catch (Exception ex)
+            {
+                return $"Error uploading to OneDrive: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Lists Planner plans accessible to the user.
+        /// </summary>
+        /// <param name="maxPlans">Maximum number of plans to retrieve (default: 10).</param>
+        /// <returns>A summary of Planner plans.</returns>
+        [Description("Lists Microsoft Planner plans accessible to the user.")]
+        public static async Task<string> ListPlannerPlans([Description("Maximum number of plans to retrieve")] int maxPlans = 10)
+        {
+            try
+            {
+                var summary = await _plannerService.GetPlansSummaryAsync("me", maxPlans);
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error listing Planner plans: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Gets tasks assigned to the user.
+        /// </summary>
+        /// <returns>A summary of user's tasks.</returns>
+        [Description("Gets tasks assigned to the user in Microsoft Planner.")]
+        public static async Task<string> GetMyPlannerTasks()
+        {
+            try
+            {
+                var summary = await _plannerService.GetUserTasksSummaryAsync("me");
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error getting Planner tasks: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Creates a new task in a Planner plan.
+        /// </summary>
+        /// <param name="planId">The plan ID.</param>
+        /// <param name="bucketId">The bucket ID.</param>
+        /// <param name="title">The task title.</param>
+        /// <returns>Confirmation message.</returns>
+        [Description("Creates a new task in a Microsoft Planner plan. Requires human confirmation.")]
+        public static async Task<string> CreatePlannerTask(
+            [Description("The plan ID")] string planId,
+            [Description("The bucket ID")] string bucketId,
+            [Description("The task title")] string title)
+        {
+            try
+            {
+                var task = await _plannerService.CreateTaskAsync(planId, bucketId, title);
+                return task?.Id != null ? $"Task created successfully. ID: {task.Id}" : "Failed to create task.";
+            }
+            catch (Exception ex)
+            {
+                return $"Error creating Planner task: {ex.Message}";
+            }
+        }
     }
 }

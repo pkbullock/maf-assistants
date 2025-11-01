@@ -16,7 +16,9 @@ namespace MAF.Assistants.Utility
             string MicrosoftGraphTenantId,
             string MicrosoftGraphClientId,
             string MicrosoftGraphClientSecret,
-            int MicrosoftGraphMaxItems
+            int MicrosoftGraphMaxItems,
+            bool MicrosoftGraphUseDelegatedAuth,
+            string MicrosoftGraphRedirectUri
          );
 
         /// <summary>
@@ -42,6 +44,8 @@ namespace MAF.Assistants.Utility
             string microsoftGraphClientId = configurationRoot["MicrosoftGraphClientId"] ?? string.Empty;
             string microsoftGraphClientSecret = configurationRoot["MicrosoftGraphClientSecret"] ?? string.Empty;
             int microsoftGraphMaxItems = int.TryParse(configurationRoot["MicrosoftGraphMaxItems"], out int maxItems) ? maxItems : 100;
+            bool microsoftGraphUseDelegatedAuth = bool.TryParse(configurationRoot["MicrosoftGraphUseDelegatedAuth"], out bool useDelegated) && useDelegated;
+            string microsoftGraphRedirectUri = configurationRoot["MicrosoftGraphRedirectUri"] ?? "http://localhost";
 
             return new Configuration(
                 azureOpenAiEndpoint,
@@ -55,7 +59,9 @@ namespace MAF.Assistants.Utility
                 microsoftGraphTenantId,
                 microsoftGraphClientId,
                 microsoftGraphClientSecret,
-                microsoftGraphMaxItems);
+                microsoftGraphMaxItems,
+                microsoftGraphUseDelegatedAuth,
+                microsoftGraphRedirectUri);
         }
     }
 }

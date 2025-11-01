@@ -31,33 +31,79 @@ The Microsoft Graph integration provides AI agents with the ability to interact 
   - Get email summaries
   - Read specific email content
   - Send emails
+  - Send emails with attachments
+  - Send HTML emails with inline images
+  - Get and download attachments
   - List mail folders
 
-### 4. AI Agent Tools
+### 4. Teams Operations
+- **Service**: `TeamsService`
+- **Capabilities**:
+  - List teams user is a member of
+  - Get channels in a team
+  - Get messages from a channel
+  - Send messages to a channel
+  - Context-aware message summaries
+
+### 5. OneDrive Operations
+- **Service**: `OneDriveService`
+- **Capabilities**:
+  - List files in OneDrive
+  - Get files from specific folders
+  - Read text file content
+  - Read binary files (images, documents)
+  - Upload text files
+  - Upload binary files
+  - Search files
+  - Context-aware file summaries
+
+### 6. Planner Operations
+- **Service**: `PlannerService`
+- **Capabilities**:
+  - List accessible plans
+  - Get tasks from a plan
+  - Get tasks assigned to user
+  - Create new tasks
+  - Update task completion status
+  - Get buckets from a plan
+  - Context-aware task summaries
+
+### 7. Batch Operations
+- **Service**: `GraphBatchService`
+- **Capabilities**:
+  - Batch retrieve multiple file contents
+  - Batch retrieve multiple emails
+  - Batch retrieve multiple user profiles
+  - Batch upload files to OneDrive
+  - Up to 20 operations per batch
+  - Improved performance for multiple operations
+
+### 8. AI Agent Tools
 - **Tools**: `GraphTools` (static class with AI-callable functions)
 - Pre-built functions that can be used by AI agents:
-  - `ListSharePointSites`: Lists available SharePoint sites
-  - `GetSharePointFiles`: Gets files from a document library
-  - `ReadSharePointFile`: Reads file content
-  - `WriteSharePointFile`: Writes/updates a file
-  - `GetRecentEmails`: Gets recent emails
-  - `ReadEmail`: Reads specific email content
-  - `SendEmail`: Sends an email
+  - **SharePoint**: `ListSharePointSites`, `GetSharePointFiles`, `ReadSharePointFile`, `WriteSharePointFile`
+  - **Email**: `GetRecentEmails`, `ReadEmail`, `SendEmail`
+  - **Teams**: `ListTeams`, `GetTeamsChannelMessages`, `SendTeamsMessage`
+  - **OneDrive**: `ListOneDriveFiles`, `ReadOneDriveFile`, `UploadToOneDrive`
+  - **Planner**: `ListPlannerPlans`, `GetMyPlannerTasks`, `CreatePlannerTask`
 
-### 5. Human-in-the-Loop Confirmation
+### 9. Human-in-the-Loop Confirmation
 - **Middleware**: `HumanInTheLoop`
 - Automatically prompts for user confirmation before executing sensitive operations
 - Default sensitive operations:
   - Sending emails
   - Writing files to SharePoint
+  - Sending Teams messages
+  - Uploading to OneDrive
+  - Creating Planner tasks
 - Extensible: can add or remove functions from the sensitive list
 
-### 6. Context Window Management
+### 10. Context Window Management
 - Automatic checking of data size against context window limits
 - Smart truncation of large result sets
 - Token estimation (1 token ≈ 4 characters)
 
-### 7. Configurable Item Limits
+### 11. Configurable Item Limits
 - Maximum items per query can be configured
 - Prevents overwhelming the AI with too much data
 - Can be overridden per-operation
@@ -71,19 +117,47 @@ Add the following settings to your user secrets:
   "MicrosoftGraphTenantId": "your-tenant-id",
   "MicrosoftGraphClientId": "your-client-id",
   "MicrosoftGraphClientSecret": "your-client-secret",
-  "MicrosoftGraphMaxItems": 100
+  "MicrosoftGraphMaxItems": 100,
+  "MicrosoftGraphUseDelegatedAuth": false,
+  "MicrosoftGraphRedirectUri": "http://localhost"
 }
 ```
 
+### Configuration Options
+
+- `MicrosoftGraphTenantId`: Azure AD tenant ID (required)
+- `MicrosoftGraphClientId`: Azure AD application (client) ID (required)
+- `MicrosoftGraphClientSecret`: Client secret for application authentication (required for app-only auth)
+- `MicrosoftGraphMaxItems`: Default maximum items to retrieve per operation (default: 100)
+- `MicrosoftGraphUseDelegatedAuth`: Use delegated (user) authentication instead of application authentication (default: false)
+- `MicrosoftGraphRedirectUri`: Redirect URI for delegated authentication (default: "http://localhost")
+
 ### Azure AD App Registration
 
+#### For Application Authentication (App-Only)
 1. Register an application in Azure AD
 2. Create a client secret
 3. Grant the following Microsoft Graph API permissions (Application permissions):
    - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint
-   - `Mail.Read` and `Mail.Send` for Email (on behalf of users)
+   - `Mail.Read` and `Mail.Send` for Email
    - `User.Read.All` for user information
+   - `Team.ReadBasic.All`, `Channel.ReadBasic.All`, `ChannelMessage.Read.All` for Teams
+   - `Files.Read.All`, `Files.ReadWrite.All` for OneDrive
+   - `Tasks.Read`, `Tasks.ReadWrite` for Planner
 4. Grant admin consent for the permissions
+
+#### For Delegated Authentication (User Context)
+1. Register an application in Azure AD
+2. Configure redirect URI (e.g., http://localhost)
+3. Grant the following Microsoft Graph API permissions (Delegated permissions):
+   - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint
+   - `Mail.Read` and `Mail.Send` for Email
+   - `User.Read` for user information
+   - `Team.ReadBasic.All`, `Channel.ReadBasic.All`, `ChannelMessage.Send` for Teams
+   - `Files.Read.All`, `Files.ReadWrite.All` for OneDrive
+   - `Tasks.Read`, `Tasks.ReadWrite` for Planner
+4. Set `MicrosoftGraphUseDelegatedAuth` to `true` in configuration
+5. User will be prompted to sign in via browser on first use
 
 ## Usage Examples
 
@@ -211,12 +285,34 @@ Utility/
 - Use more specific queries to limit data
 - The system will automatically truncate large results
 
+## Recent Enhancements
+
+### Delegated Authentication
+- ✅ Support for delegated permissions (user authentication) via Interactive Browser
+- Configure via `MicrosoftGraphUseDelegatedAuth` and `MicrosoftGraphRedirectUri` settings
+- Allows agents to act on behalf of the signed-in user
+
+### Additional Microsoft 365 Services
+- ✅ **Teams**: List teams, get channels, send/receive messages
+- ✅ **OneDrive**: List/search files, read/write files, binary file support
+- ✅ **Planner**: List plans, get tasks, create/update tasks
+
+### Batch Operations
+- ✅ GraphBatchService for improved performance
+- Supports batch file retrievals, email lookups, and uploads
+- Up to 20 operations per batch
+
+### Rich Content Support
+- ✅ Email attachments (send and receive)
+- ✅ Inline images in HTML emails
+- ✅ Binary file handling (images, documents)
+- ✅ OneDrive file upload/download for any content type
+
 ## Future Enhancements
 
 Potential additions to consider:
-- Support for delegated permissions (user authentication)
-- Additional Microsoft 365 services (Teams, OneDrive, Planner)
-- Batch operations for better performance
 - Caching layer for frequently accessed data
 - More sophisticated context window management
-- Support for rich content (images, attachments)
+- Full batch API endpoint implementation
+- Calendar and meeting operations
+- Advanced Teams features (tabs, apps)
