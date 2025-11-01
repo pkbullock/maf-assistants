@@ -49,7 +49,8 @@ namespace MAF.Assistants.Middleware
                 WriteOut.MsgYellow("\nDo you want to proceed? (yes/no): ");
                 var response = Console.ReadLine()?.Trim().ToLowerInvariant();
 
-                if (response != "yes" && response != "y")
+                var acceptedResponses = new[] { "yes", "y" };
+                if (!acceptedResponses.Contains(response))
                 {
                     WriteOut.MsgRed("❌ Operation cancelled by user.\n");
                     return "Operation cancelled by user.";

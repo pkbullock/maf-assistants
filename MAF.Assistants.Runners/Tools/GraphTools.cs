@@ -187,10 +187,11 @@ namespace MAF.Assistants.Tools
             {
                 var recipients = recipientEmails.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(e => e.Trim())
+                    .Where(e => IsValidEmail(e))
                     .ToList();
 
                 if (!recipients.Any())
-                    return "Error: No valid recipients provided.";
+                    return "Error: No valid recipients provided. Please provide valid email addresses.";
 
                 await _emailService.SendEmailAsync(senderEmail, recipients, subject, body);
                 return $"Successfully sent email to {string.Join(", ", recipients)}";
@@ -198,6 +199,25 @@ namespace MAF.Assistants.Tools
             catch (Exception ex)
             {
                 return $"Error sending email: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Validates if a string is a valid email address format.
+        /// </summary>
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
