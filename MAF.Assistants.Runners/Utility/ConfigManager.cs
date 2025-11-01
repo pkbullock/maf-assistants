@@ -11,7 +11,12 @@ namespace MAF.Assistants.Utility
             string AzureEmbeddingModelName,
             
             string FoundryLocalChatDeploymentName,
-            string OllamaLocalEmbeddingModelName
+            string OllamaLocalEmbeddingModelName,
+            
+            string MicrosoftGraphTenantId,
+            string MicrosoftGraphClientId,
+            string MicrosoftGraphClientSecret,
+            int MicrosoftGraphMaxItems
          );
 
         /// <summary>
@@ -33,6 +38,11 @@ namespace MAF.Assistants.Utility
             string foundryLocalChatDeploymentName = configurationRoot["FoundryLocalChatDeploymentName"] ?? string.Empty;
             string ollamaLocalEmbeddingModelName = configurationRoot["OllamaLocalEmbeddingModelName"] ?? string.Empty;
 
+            string microsoftGraphTenantId = configurationRoot["MicrosoftGraphTenantId"] ?? string.Empty;
+            string microsoftGraphClientId = configurationRoot["MicrosoftGraphClientId"] ?? string.Empty;
+            string microsoftGraphClientSecret = configurationRoot["MicrosoftGraphClientSecret"] ?? string.Empty;
+            int microsoftGraphMaxItems = int.TryParse(configurationRoot["MicrosoftGraphMaxItems"], out int maxItems) ? maxItems : 100;
+
             return new Configuration(
                 azureOpenAiEndpoint,
                 azureOpenAiKey,
@@ -40,7 +50,12 @@ namespace MAF.Assistants.Utility
                 azureEmbeddingModelName,
 
                 foundryLocalChatDeploymentName,
-                ollamaLocalEmbeddingModelName);
+                ollamaLocalEmbeddingModelName,
+                
+                microsoftGraphTenantId,
+                microsoftGraphClientId,
+                microsoftGraphClientSecret,
+                microsoftGraphMaxItems);
         }
     }
 }
