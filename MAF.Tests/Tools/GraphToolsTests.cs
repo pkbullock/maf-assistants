@@ -237,6 +237,35 @@ namespace MAF.Tests.Tools
         }
 
         [Fact]
+        public void ListSharePointLists_HasCorrectSignature()
+        {
+            var methodInfo = typeof(GraphTools).GetMethod("ListSharePointLists");
+            Assert.NotNull(methodInfo);
+            Assert.Equal(typeof(Task<string>), methodInfo.ReturnType);
+            
+            var parameters = methodInfo.GetParameters();
+            Assert.Equal(2, parameters.Length);
+            Assert.Equal("siteId", parameters[0].Name);
+            Assert.Equal("maxLists", parameters[1].Name);
+        }
+
+        [Fact]
+        public void GetSharePointListItems_HasCorrectSignature()
+        {
+            var methodInfo = typeof(GraphTools).GetMethod("GetSharePointListItems");
+            Assert.NotNull(methodInfo);
+            Assert.Equal(typeof(Task<string>), methodInfo.ReturnType);
+            
+            var parameters = methodInfo.GetParameters();
+            Assert.Equal(5, parameters.Length);
+            Assert.Equal("siteId", parameters[0].Name);
+            Assert.Equal("listId", parameters[1].Name);
+            Assert.Equal("maxItems", parameters[2].Name);
+            Assert.Equal("filter", parameters[3].Name);
+            Assert.Equal("fieldNames", parameters[4].Name);
+        }
+
+        [Fact]
         public void GraphTools_AllMethodsReturnTaskOfString()
         {
             var methods = typeof(GraphTools).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

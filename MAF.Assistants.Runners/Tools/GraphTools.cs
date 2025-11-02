@@ -413,5 +413,69 @@ namespace MAF.Assistants.Tools
                 return $"Error creating Planner task: {ex.Message}";
             }
         }
+
+        /// <summary>
+        /// Lists SharePoint lists from a site.
+        /// </summary>
+        /// <param name="siteId">The SharePoint site ID.</param>
+        /// <param name="maxLists">Maximum number of lists to retrieve (default: 20).</param>
+        /// <returns>A summary of SharePoint lists.</returns>
+        [Description("Lists SharePoint lists from a site. Returns list names and IDs.")]
+        public static async Task<string> ListSharePointLists(
+            [Description("The SharePoint site ID")] string siteId,
+            [Description("Maximum number of lists to retrieve")] int maxLists = 20)
+        {
+            try
+            {
+                var summary = await _sharePointService.GetListsSummaryAsync(siteId, maxLists);
+                return summary;
+            }
+            catch (Exception ex)
+            {
+                return $"Error listing SharePoint lists: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// Gets items from a SharePoint list with optional filtering.
+        /// </summary>
+        /// <param name="siteId">The SharePoint site ID.</param>
+        /// <param name="listId">The list ID.</param>
+        /// <param name="maxItems">Maximum number of items to retrieve (default: 50).</param>
+        /// <param name="filter">Optional OData filter string (e.g., "fields/Status eq 'Active'").</param>
+        /// <param name="fieldNames">Optional comma-separated list of field names to include in the output.</param>
+        /// <returns>SharePoint list items formatted as a markdown table.</returns>
+        [Description("Gets items from a SharePoint list and returns them as a markdown table. Supports filtering and field selection.")]
+        public static async Task<string> GetSharePointListItems(
+            [Description("The SharePoint site ID")] string siteId,
+            [Description("The list ID")] string listId,
+            [Description("Maximum number of items to retrieve")] int maxItems = 50,
+            [Description("Optional OData filter string")] string? filter = null,
+            [Description("Optional comma-separated list of field names to include")] string? fieldNames = null)
+        {
+            try
+            {
+                var items = await _sharePointService.GetListItemsAsync(siteId, listId, maxItems, filter);
+                
+                if (!items.Any())
+                    return "No items found in the list.";
+
+                // Parse field names if provided
+                List<string>? fields = null;
+                if (!string.IsNullOrEmpty(fieldNames))
+                {
+                    fields = fieldNames.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(f => f.Trim())
+                        .ToList();
+                }
+
+                var markdownTable = _sharePointService.ConvertListItemsToMarkdownTable(items, fields);
+                return markdownTable;
+            }
+            catch (Exception ex)
+            {
+                return $"Error getting SharePoint list items: {ex.Message}";
+            }
+        }
     }
 }
