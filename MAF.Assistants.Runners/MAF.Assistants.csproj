@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="MAF.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Agents\" />
     <Folder Include="Services\" />
     <Folder Include="Tools\" />
