@@ -23,6 +23,9 @@ The Microsoft Graph integration provides AI agents with the ability to interact 
   - Read file content
   - Write/update files
   - Context-aware file summaries
+  - **List SharePoint lists** from a site
+  - **Get list items** with OData filtering
+  - **Convert list items to markdown tables** with field selection
 
 ### 3. Email Operations
 - **Service**: `EmailService`
@@ -81,7 +84,7 @@ The Microsoft Graph integration provides AI agents with the ability to interact 
 ### 8. AI Agent Tools
 - **Tools**: `GraphTools` (static class with AI-callable functions)
 - Pre-built functions that can be used by AI agents:
-  - **SharePoint**: `ListSharePointSites`, `GetSharePointFiles`, `ReadSharePointFile`, `WriteSharePointFile`
+  - **SharePoint**: `ListSharePointSites`, `ListSharePointLists`, `GetSharePointFiles`, `GetSharePointListItems`, `ReadSharePointFile`, `WriteSharePointFile`
   - **Email**: `GetRecentEmails`, `ReadEmail`, `SendEmail`
   - **Teams**: `ListTeams`, `GetTeamsChannelMessages`, `SendTeamsMessage`
   - **OneDrive**: `ListOneDriveFiles`, `ReadOneDriveFile`, `UploadToOneDrive`
@@ -138,7 +141,7 @@ Add the following settings to your user secrets:
 1. Register an application in Azure AD
 2. Create a client secret
 3. Grant the following Microsoft Graph API permissions (Application permissions):
-   - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint
+   - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint (includes sites, lists, and list items)
    - `Mail.Read` and `Mail.Send` for Email
    - `User.Read.All` for user information
    - `Team.ReadBasic.All`, `Channel.ReadBasic.All`, `ChannelMessage.Read.All` for Teams
@@ -150,7 +153,7 @@ Add the following settings to your user secrets:
 1. Register an application in Azure AD
 2. Configure redirect URI (e.g., http://localhost)
 3. Grant the following Microsoft Graph API permissions (Delegated permissions):
-   - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint
+   - `Sites.Read.All` or `Sites.ReadWrite.All` for SharePoint (includes sites, lists, and list items)
    - `Mail.Read` and `Mail.Send` for Email
    - `User.Read` for user information
    - `Team.ReadBasic.All`, `Channel.ReadBasic.All`, `ChannelMessage.Send` for Teams
@@ -174,6 +177,8 @@ AIAgent agent = client.CreateAIAgent(
     name: "Microsoft365Assistant",
     tools: [
         AIFunctionFactory.Create(GraphTools.ListSharePointSites, "list_sharepoint_sites", "Lists available SharePoint sites"),
+        AIFunctionFactory.Create(GraphTools.ListSharePointLists, "list_sharepoint_lists", "Lists SharePoint lists from a site"),
+        AIFunctionFactory.Create(GraphTools.GetSharePointListItems, "get_sharepoint_list_items", "Gets items from a SharePoint list"),
         AIFunctionFactory.Create(GraphTools.GetRecentEmails, "get_recent_emails", "Gets recent emails"),
         // ... add other tools as needed
     ])
@@ -198,6 +203,11 @@ var content = await sharePointService.GetFileContentAsync(siteId, driveId, itemI
 var emailService = new EmailService();
 var emails = await emailService.GetEmailsAsync(userEmail, "Inbox", maxItems: 20);
 await emailService.SendEmailAsync(senderEmail, recipients, subject, body);
+
+// SharePoint Lists
+var lists = await sharePointService.GetListsAsync(siteId, maxItems: 20);
+var listItems = await sharePointService.GetListItemsAsync(siteId, listId, maxItems: 50, filter: "fields/Status eq 'Active'");
+var markdownTable = sharePointService.ConvertListItemsToMarkdownTable(listItems, new List<string> { "Title", "Status", "DueDate" });
 ```
 
 ## Running the Sample
@@ -221,6 +231,12 @@ Assistant: [Lists files in the document library]
 
 You: Read file <item-id> from that drive
 Assistant: [Displays file content]
+
+You: List SharePoint lists from site <site-id>
+Assistant: [Lists available SharePoint lists]
+
+You: Get items from list <list-id> where Status is Active
+Assistant: [Displays list items in a markdown table format]
 ```
 
 ## Security Considerations
@@ -301,6 +317,14 @@ Utility/
 - ✅ GraphBatchService for improved performance
 - Supports batch file retrievals, email lookups, and uploads
 - Up to 20 operations per batch
+
+### SharePoint Lists Support
+- ✅ **List SharePoint lists** from a site with configurable item limits
+- ✅ **Get list items** with OData filtering for precise data queries
+- ✅ **Markdown table conversion** for easy display of list data
+- ✅ **Field selection** to control which columns appear in output
+- ✅ Automatic filtering of internal SharePoint fields (@, _)
+- ✅ Proper escaping of special characters in markdown output
 
 ### Rich Content Support
 - ✅ Email attachments (send and receive)
