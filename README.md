@@ -7,10 +7,11 @@ Library for Microsoft Agent Framework Assistants
 - The agent framework relies on agents, so need a collection of agents.
 
 - Data and Storage
-    - Upload and Read files in SharePoint
-    - Organise Files in SharePoint
+    - ✅ Upload and Read files in SharePoint
+    - ✅ Organise Files in SharePoint
     - Build a library of ALL my edge short cuts
     - Build a library of hashtags for social media
+    - ✅ Microsoft Graph Integration (see [GRAPH_INTEGRATION.md](MAF.Assistants.Runners/GRAPH_INTEGRATION.md))
 - Process
     - Trigger Copilot Studio Agent
     - Trigger AI Foundry Agent
@@ -21,7 +22,8 @@ Library for Microsoft Agent Framework Assistants
     - Shorten Text for Social Media
 - Utility/Tool
     - Get Date
-    - AUthenticate to Microsoft 365 (User)
+    - ✅ Authenticate to Microsoft 365 (Application)
+    - ✅ Read and Send Emails via Microsoft Graph
     - Opens a URL in Edge
 - Agent to Agent (Microsoft 365 SDK)
     - Handoff to Copilot Studio Agent
@@ -38,6 +40,32 @@ Library for Microsoft Agent Framework Assistants
 
 - Blazor App
 
+## Microsoft Graph Integration
+
+The framework now includes comprehensive Microsoft Graph integration for connecting AI agents to Microsoft 365 services:
+
+### Features
+- **SharePoint Operations**: List sites, read/write files, manage document libraries
+- **Email Operations**: Read emails, send emails, manage mail folders
+- **Human-in-the-Loop**: Automatic confirmation prompts for sensitive operations
+- **Context Window Management**: Smart handling of large data sets
+- **Configurable Limits**: Control how many items are retrieved per operation
+- **Reusable Components**: Services and tools that can be easily integrated into any agent
+
+### Quick Start
+1. Configure your Azure AD app registration with Microsoft Graph permissions
+2. Add credentials to user secrets:
+   ```json
+   {
+     "MicrosoftGraphTenantId": "your-tenant-id",
+     "MicrosoftGraphClientId": "your-client-id",
+     "MicrosoftGraphClientSecret": "your-client-secret",
+     "MicrosoftGraphMaxItems": 100
+   }
+   ```
+3. Use the `GraphChatWithTools` runner or integrate Graph tools into your own agent
+
+For detailed documentation, see [GRAPH_INTEGRATION.md](MAF.Assistants.Runners/GRAPH_INTEGRATION.md)
 
 ## Useful Resources
 
@@ -46,6 +74,8 @@ Library for Microsoft Agent Framework Assistants
 - Microsoft 365 Agents SDK - https://github.com/microsoft/Agents
 - Microsoft Copilot Studio - https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio?WT.mc_id=M365-MVP-5003816
 - Microsoft 365 Agents SDK documentation - https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/?WT.mc_id=M365-MVP-5003816
+- Microsoft Graph API - https://learn.microsoft.com/en-us/graph/overview
+- Microsoft Graph SDK for .NET - https://learn.microsoft.com/en-us/graph/sdks/sdks-overview
 - Windows-DevRel - https://github.com/microsoft/Windows-DevRel
 - Context-Aware RAG and Chunking - https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/context-aware-rag-system-with-azure-ai-search-to-cut-token-costs-and-boost-accur/4456810
 - Hugging Face  - all-MiniLM-L6-v2 - https://huggingface.co/optimum/all-MiniLM-L6-v2

@@ -49,6 +49,11 @@ namespace MAF.Assistants.Utility
             Msg(input, ConsoleColor.Yellow);
         }
 
+        public static void MsgRed(string input)
+        {
+            Msg(input, ConsoleColor.Red);
+        }
+
         public static void EndOfProgram()
         {
             Divider();
