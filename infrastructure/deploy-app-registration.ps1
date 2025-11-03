@@ -1,5 +1,7 @@
 # PowerShell script to create Entra ID App Registration for MAF Assistants
 # Requires Az PowerShell module: Install-Module -Name Az -AllowClobber -Scope CurrentUser
+# Created majority of the file with GitHub Copilot
+# Validated and Refined by Paul Bullock 2nd Nov 2025
 
 param(
     [Parameter(Mandatory=$false)]
@@ -92,7 +94,7 @@ try {
     $app = New-AzADApplication `
         -DisplayName $ApplicationName `
         -SignInAudience "AzureADMyOrg" `
-        -Web @{ RedirectUris = @($RedirectUri); ImplicitGrantSettings = @{ EnableIdTokenIssuance = $true } } `
+        -Web @{ RedirectUris = @($RedirectUri); } `
         -RequiredResourceAccess $requiredResourceAccess
     
     $appId = $app.AppId
@@ -173,9 +175,16 @@ Write-Host "   dotnet user-secrets set `"MicrosoftGraphMaxItems`" `"100`"" -Fore
 Write-Host "   dotnet user-secrets set `"MicrosoftGraphUseDelegatedAuth`" `"false`"" -ForegroundColor Gray
 Write-Host "   dotnet user-secrets set `"MicrosoftGraphRedirectUri`" `"$RedirectUri`"" -ForegroundColor Gray
 Write-Host ""
+Write-Host "It is recommended to set owners on the application, navigate to the following link:" -ForegroundColor Yellow
+Write-Host "   https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Owners/appId/${appId}/isMSAApp~/false" -ForegroundColor Gray
+Write-Host ""
 Write-Host "Configuration Values:" -ForegroundColor Yellow
 Write-Host "  Tenant ID: $tenantId" -ForegroundColor Cyan
 Write-Host "  Client ID: $appId" -ForegroundColor Cyan
 Write-Host "  Redirect URI: $RedirectUri" -ForegroundColor Cyan
 Write-Host ""
+
+Write-Host "Check out the Azure Portal to verify the app registration and permissions." -ForegroundColor Yellow
+Write-Host "  https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${appId}/isMSAApp~/false"
+
 Write-Host "================================================" -ForegroundColor Cyan
