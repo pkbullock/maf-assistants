@@ -4,7 +4,7 @@
 # Validated and Refined by Paul Bullock 2nd Nov 2025
 
 param(
-    [string]$InstanceName = "open-ai-instance-485",
+    [string]$InstanceName = "open-ai-instance-486",
     [string]$ResourceGroupName = "rgAzureAI",
     [string]$Location = "westeurope",
     [string]$templateFile = ".\azure-open-ai.bicep"
