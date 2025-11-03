@@ -36,7 +36,8 @@ namespace MAF.Assistants.Runners
 
             string modelInstruction = @"You are a helpful assistant with access to Microsoft 365 data through Microsoft Graph.
 You can:
-- List and access SharePoint sites and files
+- List and access SharePoint sites, lists, and files
+- Read and filter SharePoint list items
 - Read and send emails
 - Help users organize and retrieve information from their Microsoft 365 environment
 
@@ -51,7 +52,9 @@ Always be clear about what data you're accessing and what actions you're taking.
                 name: agentName,
                 tools: [
                     AIFunctionFactory.Create(GraphTools.ListSharePointSites, "list_sharepoint_sites", "Lists available SharePoint sites"),
+                    AIFunctionFactory.Create(GraphTools.ListSharePointLists, "list_sharepoint_lists", "Lists SharePoint lists from a site"),
                     AIFunctionFactory.Create(GraphTools.GetSharePointFiles, "get_sharepoint_files", "Gets files from a SharePoint document library"),
+                    AIFunctionFactory.Create(GraphTools.GetSharePointListItems, "get_sharepoint_list_items", "Gets items from a SharePoint list with optional filtering"),
                     AIFunctionFactory.Create(GraphTools.ReadSharePointFile, "read_sharepoint_file", "Reads the content of a file from SharePoint"),
                     AIFunctionFactory.Create(GraphTools.WriteSharePointFile, "write_sharepoint_file", "Writes or updates a file in SharePoint"),
                     AIFunctionFactory.Create(GraphTools.GetRecentEmails, "get_recent_emails", "Gets recent emails from a user's inbox"),
@@ -64,7 +67,7 @@ Always be clear about what data you're accessing and what actions you're taking.
                 .Build();
 
             WriteOut.MsgGreen("Agent initialized with Microsoft Graph tools.");
-            WriteOut.MsgGrey("Available tools: SharePoint (list sites, read/write files), Email (read, send)");
+            WriteOut.MsgGrey("Available tools: SharePoint (list sites/lists, get list items, read/write files), Email (read, send)");
             WriteOut.Divider();
 
             // Interactive chat loop
