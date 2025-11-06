@@ -179,5 +179,17 @@ namespace MAF.Tests.Services
                 Assert.Contains(expectedMethod, publicMethods);
             }
         }
+
+
+        [Fact]
+        public async Task EmailService_CallsEmailService_Live()
+        {
+            EmailService emailService = new EmailService();
+            var result = await emailService.GetEmailsAsync("norma.person@pkbmvp.onmicrosoft.com", maxItems: 5);
+
+            Assert.NotNull(result);
+            Assert.True(result.Count > 0);
+
+        }
     }
 }
