@@ -71,11 +71,10 @@ $requiredResourceAccess = @{
         @{ Id = "4d02b0cc-d90b-441f-8d82-4fb55c34d6bb"; Type = "Role" }  # ChannelMessage.Send
         @{ Id = "01d4889c-1287-42c6-ac1f-5d1e02578ef6"; Type = "Role" }  # Files.Read.All
         @{ Id = "75359482-378d-4052-8f01-80520e7db3cd"; Type = "Role" }  # Files.ReadWrite.All
-        @{ Id = "913e9c1b-3c8a-4e47-a739-b66df0f6f2a6"; Type = "Role" }  # Tasks.Read
-        @{ Id = "b1b3e0c7-9a6f-4ce0-832e-8e7b0f2e3f0c"; Type = "Role" }  # Tasks.ReadWrite
+        
+        
         # Delegated permissions
         @{ Id = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"; Type = "Scope" } # User.Read
-        @{ Id = "2cfdc887-d7b4-4798-9b33-3d98d6b95dd2"; Type = "Scope" } # Sites.Read.All
         @{ Id = "89fe6a52-be36-487e-b7d8-d061c450a026"; Type = "Scope" } # Sites.ReadWrite.All
         @{ Id = "570282fd-fa5c-430d-a7fd-fc8dc98a9dca"; Type = "Scope" } # Mail.Read
         @{ Id = "e383f46e-2787-4529-855e-0e479a3ffac0"; Type = "Scope" } # Mail.Send
