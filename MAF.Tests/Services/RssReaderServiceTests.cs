@@ -1,5 +1,6 @@
 using Xunit;
 using MAF.Assistants.Services;
+using MAF.Assistants.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

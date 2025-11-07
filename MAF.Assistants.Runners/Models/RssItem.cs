@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MAF.Assistants.Services
+namespace MAF.Assistants.Models
 {
     /// <summary>
     /// Represents an RSS feed item with key information.
