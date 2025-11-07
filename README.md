@@ -24,6 +24,7 @@ Library for Microsoft Agent Framework Assistants
     - Get Date
     - ✅ Authenticate to Microsoft 365 (Application)
     - ✅ Read and Send Emails via Microsoft Graph
+    - ✅ RSS Reader for Websites (see [RSS_READER.md](MAF.Assistants.Runners/RSS_READER.md))
     - Opens a URL in Edge
 - Agent to Agent (Microsoft 365 SDK)
     - Handoff to Copilot Studio Agent
@@ -66,6 +67,34 @@ The framework now includes comprehensive Microsoft Graph integration for connect
 3. Use the `GraphChatWithTools` runner or integrate Graph tools into your own agent
 
 For detailed documentation, see [GRAPH_INTEGRATION.md](MAF.Assistants.Runners/GRAPH_INTEGRATION.md)
+
+## RSS Reader Service
+
+The framework includes an RSS Reader service for reading and parsing RSS/Atom feeds from websites:
+
+### Features
+- **Feed Parsing**: Read RSS 2.0 and Atom feeds from any URL
+- **Structured Data**: Extract title, published date, content, excerpt, author, and links
+- **URL Extraction**: Automatically extract referenced URLs from content
+- **HTML Processing**: Strip HTML tags and decode entities for clean text
+- **Flexible Retrieval**: Read all items or limit to a specific number
+
+### Quick Start
+1. Create an instance of `RssReaderService`
+2. Call `ReadFeedAsync` with the feed URL:
+   ```csharp
+   var rssService = new RssReaderService();
+   var items = await rssService.ReadFeedAsync("https://example.com/feed.xml", maxItems: 10);
+   
+   foreach (var item in items)
+   {
+       Console.WriteLine($"{item.Title} - {item.Link}");
+       Console.WriteLine($"Published: {item.PublishedDate}");
+       Console.WriteLine($"Excerpt: {item.Excerpt}");
+   }
+   ```
+
+For detailed documentation, see [RSS_READER.md](MAF.Assistants.Runners/RSS_READER.md)
 
 ## Useful Resources
 
