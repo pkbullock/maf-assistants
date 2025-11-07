@@ -15,10 +15,16 @@ namespace MAF.Assistants.Services
     /// </summary>
     public class RssReaderService
     {
+        // Note: Using static HttpClient is acceptable for this simple scenario.
+        // For production applications with DI, consider using IHttpClientFactory.
         private static readonly HttpClient _httpClient = new HttpClient();
         private static readonly Regex _urlRegex = new Regex(
             @"https?://[^\s<>""']+", 
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _htmlTagRegex = new Regex(
+            @"<[^>]+>",
+            RegexOptions.Compiled);
+        private const int DefaultExcerptLength = 200;
 
         /// <summary>
         /// Reads an RSS feed from the specified URL.
@@ -142,8 +148,8 @@ namespace MAF.Assistants.Services
             if (!string.IsNullOrWhiteSpace(content))
             {
                 var plainText = StripHtml(content);
-                return plainText.Length > 200 
-                    ? plainText.Substring(0, 200) + "..." 
+                return plainText.Length > DefaultExcerptLength 
+                    ? plainText.Substring(0, DefaultExcerptLength) + "..." 
                     : plainText;
             }
 
@@ -178,7 +184,7 @@ namespace MAF.Assistants.Services
             }
 
             // Remove HTML tags
-            var stripped = Regex.Replace(html, @"<[^>]+>", string.Empty);
+            var stripped = _htmlTagRegex.Replace(html, string.Empty);
             
             // Decode HTML entities
             stripped = System.Net.WebUtility.HtmlDecode(stripped);
