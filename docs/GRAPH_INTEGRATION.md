@@ -6,7 +6,30 @@ This document describes the Microsoft Graph integration features added to the MA
 
 The Microsoft Graph integration provides AI agents with the ability to interact with Microsoft 365 services, including SharePoint and Outlook. The implementation is designed to be reusable, secure, and context-aware.
 
-## Features
+The framework now includes comprehensive Microsoft Graph integration for connecting AI agents to Microsoft 365 services:
+
+### Summary Features
+- **SharePoint Operations**: List sites, read/write files, manage document libraries
+- **Email Operations**: Read emails, send emails, manage mail folders
+- **Human-in-the-Loop**: Automatic confirmation prompts for sensitive operations
+- **Context Window Management**: Smart handling of large data sets
+- **Configurable Limits**: Control how many items are retrieved per operation
+- **Reusable Components**: Services and tools that can be easily integrated into any agent
+
+### Quick Start
+1. Configure your Azure AD app registration with Microsoft Graph permissions
+2. Add credentials to user secrets:
+   ```json
+   {
+     "MicrosoftGraphTenantId": "your-tenant-id",
+     "MicrosoftGraphClientId": "your-client-id",
+     "MicrosoftGraphClientSecret": "your-client-secret",
+     "MicrosoftGraphMaxItems": 100
+   }
+   ```
+3. Use the `GraphChatWithTools` runner or integrate Graph tools into your own agent
+
+## Detailed Features
 
 ### 1. Microsoft Graph Authentication
 - **Service**: `GraphService` (base class)

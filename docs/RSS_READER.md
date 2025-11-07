@@ -42,6 +42,30 @@ The service requires the following NuGet package (already included):
 
 ## Usage Examples
 
+The framework includes an RSS Reader service for reading and parsing RSS/Atom feeds from websites:
+
+### Features
+- **Feed Parsing**: Read RSS 2.0 and Atom feeds from any URL
+- **Structured Data**: Extract title, published date, content, excerpt, author, and links
+- **URL Extraction**: Automatically extract referenced URLs from content
+- **HTML Processing**: Strip HTML tags and decode entities for clean text
+- **Flexible Retrieval**: Read all items or limit to a specific number
+
+### Quick Start
+1. Create an instance of `RssReaderService`
+2. Call `ReadFeedAsync` with the feed URL:
+   ```csharp
+   var rssService = new RssReaderService();
+   var items = await rssService.ReadFeedAsync("https://example.com/feed.xml", maxItems: 10);
+   
+   foreach (var item in items)
+   {
+       Console.WriteLine($"{item.Title} - {item.Link}");
+       Console.WriteLine($"Published: {item.PublishedDate}");
+       Console.WriteLine($"Excerpt: {item.Excerpt}");
+   }
+   ```
+
 ### Basic Usage - Read All Items
 
 ```csharp
@@ -62,6 +86,8 @@ foreach (var item in items)
     Console.WriteLine();
 }
 ```
+
+
 
 ### Read Limited Number of Items
 
