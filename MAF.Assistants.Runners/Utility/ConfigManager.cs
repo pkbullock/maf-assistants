@@ -18,7 +18,10 @@ namespace MAF.Assistants.Utility
             string MicrosoftGraphClientSecret,
             int MicrosoftGraphMaxItems,
             bool MicrosoftGraphUseDelegatedAuth,
-            string MicrosoftGraphRedirectUri
+            string MicrosoftGraphRedirectUri,
+            
+            string GitHubToken,
+            int GitHubMaxItems
          );
 
         /// <summary>
@@ -47,6 +50,9 @@ namespace MAF.Assistants.Utility
             bool microsoftGraphUseDelegatedAuth = bool.TryParse(configurationRoot["MicrosoftGraphUseDelegatedAuth"], out bool useDelegated) && useDelegated;
             string microsoftGraphRedirectUri = configurationRoot["MicrosoftGraphRedirectUri"] ?? "http://localhost";
 
+            string gitHubToken = configurationRoot["GitHubToken"] ?? string.Empty;
+            int gitHubMaxItems = int.TryParse(configurationRoot["GitHubMaxItems"], out int ghMaxItems) ? ghMaxItems : 50;
+
             return new Configuration(
                 azureOpenAiEndpoint,
                 azureOpenAiKey,
@@ -61,7 +67,10 @@ namespace MAF.Assistants.Utility
                 microsoftGraphClientSecret,
                 microsoftGraphMaxItems,
                 microsoftGraphUseDelegatedAuth,
-                microsoftGraphRedirectUri);
+                microsoftGraphRedirectUri,
+                
+                gitHubToken,
+                gitHubMaxItems);
         }
     }
 }
