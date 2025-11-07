@@ -47,6 +47,11 @@ namespace MAF.Assistants.Services
         protected int MaxItems => _maxItems;
 
         /// <summary>
+        /// Token estimation constant: approximately 4 characters per token.
+        /// </summary>
+        private const int CharactersPerToken = 4;
+
+        /// <summary>
         /// Tests the connection to GitHub by retrieving the authenticated user details.
         /// </summary>
         /// <returns>True if connection is successful, false otherwise.</returns>
@@ -57,8 +62,14 @@ namespace MAF.Assistants.Services
                 var user = await _githubClient.User.Current();
                 return user != null;
             }
-            catch (Exception)
+            catch (Octokit.AuthorizationException)
             {
+                // Invalid or expired token
+                return false;
+            }
+            catch (Octokit.ApiException)
+            {
+                // GitHub API error
                 return false;
             }
         }
@@ -104,9 +115,16 @@ namespace MAF.Assistants.Services
                 // Convert search results to pull requests
                 foreach (var issue in searchResult.Items.Take(itemsToRetrieve))
                 {
-                    var parts = issue.Url.ToString().Split('/');
-                    var repoOwner = parts[^4];
-                    var repoName = parts[^3];
+                    // Parse repository owner and name from URL
+                    // URL format: https://api.github.com/repos/{owner}/{repo}/issues/{number}
+                    var urlParts = issue.Url.ToString().Split('/');
+                    if (urlParts.Length < 7)
+                    {
+                        continue; // Skip if URL format is unexpected
+                    }
+                    
+                    var repoOwner = urlParts[^4];
+                    var repoName = urlParts[^3];
                     var prNumber = issue.Number;
                     
                     var pr = await _githubClient.PullRequest.Get(repoOwner, repoName, prNumber);
@@ -290,8 +308,7 @@ namespace MAF.Assistants.Services
         /// <returns>True if estimated to fit, false otherwise.</returns>
         protected bool CheckContextWindowSize(string textContent, int maxTokens = 8000)
         {
-            // Rough estimation: 1 token ≈ 4 characters
-            int estimatedTokens = textContent.Length / 4;
+            int estimatedTokens = textContent.Length / CharactersPerToken;
             return estimatedTokens <= maxTokens;
         }
     }
