@@ -130,7 +130,7 @@ namespace MAF.Assistants.Utility
             throw new NotImplementedException();
         }
 
-        public static void Ollima() {
+        public static void Ollama() {
 
             throw new NotImplementedException();
         }
