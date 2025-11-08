@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MAF.Assistants.Utility
 {
-    internal static class Clients
+    public static class Clients
     {
         /// <summary>
         /// Creates and returns a new instance of the <see cref="AzureOpenAIClient"/> configured with the Azure OpenAI
@@ -130,7 +130,7 @@ namespace MAF.Assistants.Utility
             throw new NotImplementedException();
         }
 
-        public static void Ollama() {
+        public static void Ollima() {
 
             throw new NotImplementedException();
         }

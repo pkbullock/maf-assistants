@@ -1,6 +1,7 @@
 using MAF.UI.Components;
 using MAF.UI.Services;
-using MAF.Assistants.Agents;
+using MAF.Assistants.Interfaces;
+using MAF.Assistants.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +15,8 @@ builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<AdaptiveCardService>();
 builder.Services.AddSingleton<ChatService>();
 
-// Add Agents
-builder.Services.AddSingleton<SimpleChatAgent>();
+// Add Agent Factory
+builder.Services.AddSingleton<IChatAgentFactory, ChatAgentFactory>();
 
 var app = builder.Build();
 

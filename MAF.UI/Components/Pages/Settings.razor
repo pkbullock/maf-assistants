@@ -1,5 +1,7 @@
 @page "/settings"
 @using MAF.UI.Services
+@using MAF.Assistants.Models
+@using MAF.Assistants.Utilities
 @inject ChatService ChatService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
@@ -41,6 +43,41 @@
                     <input type="checkbox" checked="@ChatService.Settings.IsTestMode" @onchange="HandleTestModeToggle" />
                     <span class="toggle-slider"></span>
                 </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Agent Selection</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Active Agent</label>
+                    <p>Choose the AI agent personality and capabilities</p>
+                </div>
+            </div>
+                
+            <div class="agent-selector">
+                @foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
+                {
+                    var isSelected = ChatService.Settings.SelectedAgentType == agentType;
+                    <button class="agent-option @(isSelected ? "selected" : "")" 
+                        @onclick="() => HandleAgentSelection(agentType)"
+                        disabled="@isTogglingMode">
+                        <div class="agent-icon">@agentType.GetIcon()</div>
+                        <div class="agent-details">
+                            <div class="agent-name">@agentType.GetDisplayName()</div>
+                            <div class="agent-description">@agentType.GetFullDescription()</div>
+                        </div>
+                        @if (isSelected)
+                        {
+                            <div class="selected-indicator">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        }
+                    </button>
+                }
             </div>
         </div>
 
@@ -188,5 +225,24 @@
     private void HandleAutoSaveToggle(ChangeEventArgs e)
     {
         autoSave = (bool)(e.Value ?? false);
+    }
+
+    private async Task HandleAgentSelection(AgentType agentType)
+    {
+        if (isTogglingMode || ChatService.Settings.SelectedAgentType == agentType) 
+            return;
+        
+        isTogglingMode = true;
+        StateHasChanged();
+        
+        try
+        {
+            await ChatService.SwitchAgentAsync(agentType);
+        }
+        finally
+        {
+            isTogglingMode = false;
+            StateHasChanged();
+        }
     }
 }

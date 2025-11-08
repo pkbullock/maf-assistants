@@ -1,4 +1,5 @@
-using MAF.Assistants.Agents;
+using MAF.Assistants.Interfaces;
+using MAF.Assistants.Models;
 using Microsoft.Agents.AI;
 using System.Text;
 
@@ -6,23 +7,28 @@ namespace MAF.UI.Services;
 
 public class AgentService
 {
-    private readonly bool _isCloudMode;
-    private readonly SimpleChatAgent _simpleChatAgent;
+    private readonly IChatAgentFactory _chatAgentFactory;
+    private readonly AgentConfiguration _configuration;
     private AIAgent? _aiAgent;
     private bool _isInitialized = false;
 
-    public AgentService(SimpleChatAgent simpleChatAgent, bool isCloudMode = true)
+    public AgentService(IChatAgentFactory chatAgentFactory, bool isCloudMode = true)
+        : this(chatAgentFactory, new AgentConfiguration { IsCloudMode = isCloudMode })
     {
-        _simpleChatAgent = simpleChatAgent;
-        _isCloudMode = isCloudMode;
+    }
+
+    public AgentService(IChatAgentFactory chatAgentFactory, AgentConfiguration configuration)
+    {
+        _chatAgentFactory = chatAgentFactory;
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     public void Initialize()
     {
         try
         {
-            // Initialize the AI agent using SimpleChatAgent with the appropriate mode
-            _aiAgent = _simpleChatAgent.CreateChatAgent(_isCloudMode);
+            // Initialize the AI agent using the factory with the configuration
+            _aiAgent = _chatAgentFactory.CreateChatAgent(_configuration);
             _isInitialized = true;
         }
         catch (Exception ex)
