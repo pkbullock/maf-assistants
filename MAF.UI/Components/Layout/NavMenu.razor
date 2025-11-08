@@ -1,0 +1,105 @@
+@using MAF.UI.Services
+@using MAF.UI.Models
+@inject ChatService ChatService
+@inject NavigationManager Navigation
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div class="nav-menu">
+    <div class="nav-header">
+        <button class="new-chat-button" @onclick="HandleNewChat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            New Chat
+        </button>
+    </div>
+
+    <div class="nav-scrollable">
+        <div class="nav-section">
+            <h3 class="section-title">Chat History</h3>
+            @if (sessions.Any())
+            {
+                @foreach (var session in sessions)
+                {
+                    <button class="chat-item @(currentSession?.Id == session.Id ? "active" : "")" 
+                            @onclick="() => HandleSelectSession(session.Id)">
+                        <div class="chat-item-content">
+                            <div class="chat-title">@session.Title</div>
+                            <div class="chat-date">@FormatDate(session.LastMessageAt)</div>
+                        </div>
+                    </button>
+                }
+            }
+            else
+            {
+                <div class="empty-state">No chat history</div>
+            }
+        </div>
+    </div>
+
+    <div class="nav-footer">
+        <button class="settings-button" title="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 1v6m0 6v6M23 12h-6m-6 0H1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Settings
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<ChatSession> sessions = new();
+    private ChatSession? currentSession;
+
+    protected override void OnInitialized()
+    {
+        LoadSessions();
+        ChatService.OnChange += OnChatServiceChanged;
+    }
+
+    private void LoadSessions()
+    {
+        sessions = ChatService.GetSessions();
+        currentSession = ChatService.GetCurrentSession();
+    }
+
+    private void OnChatServiceChanged()
+    {
+        LoadSessions();
+        StateHasChanged();
+    }
+
+    private void HandleNewChat()
+    {
+        ChatService.CreateNewSession();
+        Navigation.NavigateTo("/", forceLoad: false);
+    }
+
+    private void HandleSelectSession(string sessionId)
+    {
+        ChatService.SetCurrentSession(sessionId);
+        Navigation.NavigateTo("/", forceLoad: false);
+    }
+
+    private string FormatDate(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes} min ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+        if (diff.TotalDays < 30)
+            return date.ToString("MMM d, HH:mm");
+        
+        return date.ToString("MMM d, yyyy");
+    }
+
+    public void Dispose()
+    {
+        ChatService.OnChange -= OnChatServiceChanged;
+    }
+}
