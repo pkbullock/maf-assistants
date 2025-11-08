@@ -1,0 +1,212 @@
+﻿@page "/"
+@using MAF.UI.Models
+@using MAF.UI.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject ChatService ChatService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<PageTitle>AI Agent Chat</PageTitle>
+
+<div class="chat-container">
+    @if (currentSession == null || currentSession.Messages.Count == 0)
+    {
+        <!-- Home screen with conversation starters -->
+        <div class="home-screen">
+            <div class="home-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>Start a conversation</h1>
+            <p class="subtitle">Ask me anything or try one of these suggestions to get started</p>
+            
+            <div class="conversation-starters">
+                @foreach (var prompt in conversationStarters)
+                {
+                    <button class="starter-button" @onclick="() => HandleStarterClick(prompt)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        @prompt
+                    </button>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Chat messages -->
+        <div class="messages-container" @ref="messagesContainer">
+            @foreach (var message in currentSession.Messages)
+            {
+                <div class="message @(message.IsUser ? "user-message" : "ai-message")">
+                    <div class="message-content">
+                        @if (message.IsUser)
+                        {
+                            <div class="message-text">@message.Content</div>
+                        }
+                        else
+                        {
+                            <div class="message-text">
+                                @((MarkupString)ChatService.Markdown.ConvertToHtml(message.Content))
+                            </div>
+                        }
+                        @if (message.AttachedFiles != null && message.AttachedFiles.Any())
+                        {
+                            <div class="attached-files">
+                                @foreach (var file in message.AttachedFiles)
+                                {
+                                    <div class="file-badge">📎 @file</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            @if (isProcessing)
+            {
+                <div class="message ai-message">
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    
+    <!-- Message input -->
+    <div class="input-container">
+        @if (attachedFiles.Any())
+        {
+            <div class="attached-files-preview">
+                @foreach (var file in attachedFiles)
+                {
+                    <div class="file-preview">
+                        <span>📎 @file</span>
+                        <button class="remove-file" @onclick="() => RemoveFile(file)">✕</button>
+                    </div>
+                }
+            </div>
+        }
+        <div class="input-wrapper">
+            <InputFile id="fileInput" OnChange="HandleFileSelected" hidden multiple />
+            <label for="fileInput" class="attach-button" title="Attach file">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </label>
+            <textarea 
+                class="message-input" 
+                placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+                @bind="inputMessage"
+                @bind:event="oninput"
+                @onkeydown="HandleKeyDown"
+                rows="1"
+                disabled="@isProcessing"></textarea>
+            <button class="send-button" @onclick="HandleSendMessage" disabled="@(string.IsNullOrWhiteSpace(inputMessage) || isProcessing)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ChatSession? currentSession;
+    private string inputMessage = string.Empty;
+    private bool isProcessing = false;
+    private ElementReference messagesContainer;
+    private List<string> attachedFiles = new();
+
+    private readonly string[] conversationStarters = new[]
+    {
+        "Explain quantum computing in simple terms",
+        "Help me write a professional email",
+        "What are the best practices for API design?",
+        "Summarize the key concepts of machine learning"
+    };
+
+    protected override void OnInitialized()
+    {
+        currentSession = ChatService.GetCurrentSession();
+        ChatService.OnChange += OnChatServiceChanged;
+    }
+
+    private void OnChatServiceChanged()
+    {
+        currentSession = ChatService.GetCurrentSession();
+        StateHasChanged();
+    }
+
+    private async Task HandleStarterClick(string prompt)
+    {
+        inputMessage = prompt;
+        await HandleSendMessage();
+    }
+
+    private async Task HandleSendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(inputMessage) || isProcessing)
+            return;
+
+        var message = inputMessage.Trim();
+        var files = attachedFiles.Any() ? new List<string>(attachedFiles) : null;
+        inputMessage = string.Empty;
+        attachedFiles.Clear();
+        isProcessing = true;
+
+        try
+        {
+            await ChatService.SendMessageAsync(message, files);
+            currentSession = ChatService.GetCurrentSession();
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await HandleSendMessage();
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            foreach (var file in e.GetMultipleFiles(10)) // Max 10 files
+            {
+                // For now, just store the file names
+                // In a full implementation, you would upload the file to a server
+                attachedFiles.Add(file.Name);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error selecting files: {ex.Message}");
+        }
+    }
+
+    private void RemoveFile(string fileName)
+    {
+        attachedFiles.Remove(fileName);
+    }
+
+    public void Dispose()
+    {
+        ChatService.OnChange -= OnChatServiceChanged;
+    }
+}
+

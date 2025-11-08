@@ -39,7 +39,12 @@ Library for Microsoft Agent Framework Assistants
 
 ## Build a front end for MAF Chat
 
-- Blazor App
+- ✅ Blazor App (MAF.UI)
+  - Dark-themed chat interface
+  - Mock mode for development
+  - Conversation starters and chat history
+  - Real-time message updates via SignalR
+  - See MAF.UI project for details
 
 ## Detailed Documentation
 

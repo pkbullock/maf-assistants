@@ -1,0 +1,57 @@
+﻿@inherits LayoutComponentBase
+@using MAF.UI.Services
+@inject ChatService ChatService
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row">
+            <div class="title-section">
+                <h1>AI Agent Chat</h1>
+                @if (ChatService.Settings.IsTestMode)
+                {
+                    <span class="test-mode-badge">✨ Test Mode Active</span>
+                }
+            </div>
+            <div class="mode-toggle">
+                <button class="cloud-mode-button" @onclick="HandleModeToggle" title="Switch to @(ChatService.Settings.IsCloudMode ? "Local" : "Cloud") Mode">
+                    @if (ChatService.Settings.IsCloudMode)
+                    {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Cloud</span>
+                    }
+                    else
+                    {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span>Local</span>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private void HandleModeToggle()
+    {
+        ChatService.SwitchMode(!ChatService.Settings.IsCloudMode);
+    }
+}

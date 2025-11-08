@@ -1,0 +1,136 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar {
+    background: #0f1419;
+    border-right: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.top-row {
+    background: #1a1f2e;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    flex-shrink: 0;
+}
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title-section h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin: 0;
+}
+
+.test-mode-badge {
+    padding: 0.375rem 0.75rem;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.mode-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.cloud-mode-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(55, 65, 81, 0.5);
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 0.5rem;
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.cloud-mode-button:hover {
+    background: rgba(75, 85, 99, 0.7);
+    border-color: rgba(107, 114, 128, 0.7);
+}
+
+.content {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+@media (max-width: 640.98px) {
+    .top-row {
+        padding: 0 1rem;
+    }
+    
+    .title-section h1 {
+        font-size: 1rem;
+    }
+    
+    .test-mode-badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 250px;
+        height: 100vh;
+        flex-shrink: 0;
+    }
+
+    .top-row {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: #fee;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
