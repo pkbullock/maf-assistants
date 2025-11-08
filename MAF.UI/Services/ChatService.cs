@@ -1,4 +1,6 @@
 using MAF.UI.Models;
+using Microsoft.Agents.AI;
+using MAF.Assistants.Agents;
 
 namespace MAF.UI.Services;
 
@@ -11,21 +13,23 @@ public class ChatService
     private readonly ChatStorageService _storageService;
     private readonly MarkdownService _markdownService;
     private readonly AdaptiveCardService _adaptiveCardService;
+    private readonly SimpleChatAgent _simpleChatAgent;
     private AgentService? _agentService;
 
     public event Action? OnChange;
 
-    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService)
+    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService, SimpleChatAgent simpleChatAgent)
     {
         _storageService = storageService;
-        _markdownService = markdownService;
+      _markdownService = markdownService;
         _adaptiveCardService = adaptiveCardService;
+        _simpleChatAgent = simpleChatAgent;
         
         // Initialize available agents
         InitializeAgents();
         
-        // Load saved sessions
-        _ = LoadSessionsAsync();
+     // Load saved sessions
+      _ = LoadSessionsAsync();
     }
 
     public AppSettings Settings => _settings;
@@ -119,37 +123,37 @@ public class ChatService
         return exportPath;
     }
 
-    public void SwitchMode(bool isCloudMode)
+    public async Task SwitchModeAsync(bool isCloudMode)
     {
         _settings.IsCloudMode = isCloudMode;
         
         // Reinitialize agent service if not in mock mode
         if (!_settings.IsMockMode)
         {
-            InitializeAgent();
+            await InitializeAgentAsync();
         }
         
         NotifyStateChanged();
     }
 
-    public void ToggleMockMode(bool isMockMode)
+    public async Task ToggleMockModeAsync(bool isMockMode)
     {
         _settings.IsMockMode = isMockMode;
         
         if (!isMockMode)
         {
-            InitializeAgent();
+            await InitializeAgentAsync();
         }
         
         NotifyStateChanged();
     }
 
-    private void InitializeAgent()
+    private async Task InitializeAgentAsync()
     {
         try
         {
-            _agentService = new AgentService(_settings.IsCloudMode);
-            _agentService.Initialize();
+            _agentService = new AgentService(_simpleChatAgent, _settings.IsCloudMode);
+            await Task.Run(() => _agentService.Initialize());
         }
         catch (Exception ex)
         {

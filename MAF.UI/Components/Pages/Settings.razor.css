@@ -89,6 +89,13 @@
     margin: 0;
 }
 
+.status-message {
+    font-size: 0.875rem;
+    color: #60a5fa;
+    font-style: italic;
+    margin-top: 0.25rem;
+}
+
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -152,8 +159,13 @@ input:checked + .toggle-slider:before {
     transition: all 0.2s;
 }
 
-.mode-selector button:hover {
-    border-color: rgba(107, 114, 128, 0.7);
+.mode-selector button:hover:not(:disabled) {
+  border-color: rgba(107, 114, 128, 0.7);
+}
+
+.mode-selector button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .mode-selector button.active {
@@ -175,4 +187,9 @@ input:checked + .toggle-slider:before {
 .secondary-button:hover {
     background: rgba(239, 68, 68, 0.1);
     border-color: #ef4444;
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
