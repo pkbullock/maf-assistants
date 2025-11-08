@@ -17,7 +17,7 @@
                 }
             </div>
             <div class="mode-toggle">
-                <button class="cloud-mode-button" title="Switch to @(ChatService.Settings.IsCloudMode ? "Local" : "Cloud") Mode">
+                <button class="cloud-mode-button" @onclick="HandleModeToggle" title="Switch to @(ChatService.Settings.IsCloudMode ? "Local" : "Cloud") Mode">
                     @if (ChatService.Settings.IsCloudMode)
                     {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -48,3 +48,10 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private void HandleModeToggle()
+    {
+        ChatService.SwitchMode(!ChatService.Settings.IsCloudMode);
+    }
+}

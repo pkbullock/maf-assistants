@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using MAF.UI.Models
 @using MAF.UI.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject ChatService ChatService
 @implements IDisposable
 @rendermode InteractiveServer
@@ -43,7 +44,16 @@
             {
                 <div class="message @(message.IsUser ? "user-message" : "ai-message")">
                     <div class="message-content">
-                        <div class="message-text">@message.Content</div>
+                        @if (message.IsUser)
+                        {
+                            <div class="message-text">@message.Content</div>
+                        }
+                        else
+                        {
+                            <div class="message-text">
+                                @((MarkupString)ChatService.Markdown.ConvertToHtml(message.Content))
+                            </div>
+                        }
                         @if (message.AttachedFiles != null && message.AttachedFiles.Any())
                         {
                             <div class="attached-files">
@@ -73,12 +83,25 @@
     
     <!-- Message input -->
     <div class="input-container">
+        @if (attachedFiles.Any())
+        {
+            <div class="attached-files-preview">
+                @foreach (var file in attachedFiles)
+                {
+                    <div class="file-preview">
+                        <span>📎 @file</span>
+                        <button class="remove-file" @onclick="() => RemoveFile(file)">✕</button>
+                    </div>
+                }
+            </div>
+        }
         <div class="input-wrapper">
-            <button class="attach-button" title="Attach file" @onclick="HandleAttachFile">
+            <InputFile id="fileInput" OnChange="HandleFileSelected" hidden multiple />
+            <label for="fileInput" class="attach-button" title="Attach file">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-            </button>
+            </label>
             <textarea 
                 class="message-input" 
                 placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
@@ -101,6 +124,7 @@
     private string inputMessage = string.Empty;
     private bool isProcessing = false;
     private ElementReference messagesContainer;
+    private List<string> attachedFiles = new();
 
     private readonly string[] conversationStarters = new[]
     {
@@ -134,12 +158,14 @@
             return;
 
         var message = inputMessage.Trim();
+        var files = attachedFiles.Any() ? new List<string>(attachedFiles) : null;
         inputMessage = string.Empty;
+        attachedFiles.Clear();
         isProcessing = true;
 
         try
         {
-            await ChatService.SendMessageAsync(message);
+            await ChatService.SendMessageAsync(message, files);
             currentSession = ChatService.GetCurrentSession();
         }
         finally
@@ -156,10 +182,26 @@
         }
     }
 
-    private void HandleAttachFile()
+    private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        // TODO: Implement file upload functionality
-        // For now, this is a placeholder
+        try
+        {
+            foreach (var file in e.GetMultipleFiles(10)) // Max 10 files
+            {
+                // For now, just store the file names
+                // In a full implementation, you would upload the file to a server
+                attachedFiles.Add(file.Name);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error selecting files: {ex.Message}");
+        }
+    }
+
+    private void RemoveFile(string fileName)
+    {
+        attachedFiles.Remove(fileName);
     }
 
     public void Dispose()

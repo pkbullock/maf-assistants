@@ -8,6 +8,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Add custom services
+builder.Services.AddSingleton<ChatStorageService>();
+builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<ChatService>();
 
 var app = builder.Build();

@@ -39,7 +39,7 @@
     </div>
 
     <div class="nav-footer">
-        <button class="settings-button" title="Settings">
+        <button class="settings-button" @onclick="HandleSettings" title="Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
                 <path d="M12 1v6m0 6v6M23 12h-6m-6 0H1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -57,6 +57,11 @@
     {
         LoadSessions();
         ChatService.OnChange += OnChatServiceChanged;
+    }
+
+    private void HandleSettings()
+    {
+        Navigation.NavigateTo("/settings");
     }
 
     private void LoadSessions()

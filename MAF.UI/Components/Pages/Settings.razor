@@ -1,0 +1,163 @@
+@page "/settings"
+@using MAF.UI.Services
+@inject ChatService ChatService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Settings - AI Agent Chat</PageTitle>
+
+<div class="settings-page">
+    <div class="settings-header">
+        <button class="back-button" @onclick="GoBack">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+        </button>
+        <h1>Settings</h1>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>General</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Mock Mode</label>
+                    <p>Simulate AI responses without backend connection</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked="@ChatService.Settings.IsMockMode" @onchange="HandleMockModeToggle" />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Test Mode</label>
+                    <p>Enable testing features and debug information</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked="@ChatService.Settings.IsTestMode" @onchange="HandleTestModeToggle" />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>AI Configuration</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Cloud/Local Mode</label>
+                    <p>@(ChatService.Settings.IsCloudMode ? "Using cloud-based AI service" : "Using local AI model")</p>
+                </div>
+                <div class="mode-selector">
+                    <button class="@(ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(true)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Cloud
+                    </button>
+                    <button class="@(!ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(false)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Local
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Storage</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Chat History</label>
+                    <p>@storagePath</p>
+                </div>
+                <button class="secondary-button" @onclick="HandleClearHistory">
+                    Clear History
+                </button>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Save Automatically</label>
+                    <p>Save chat sessions automatically</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked="@autoSave" @onchange="HandleAutoSaveToggle" />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>About</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Version</label>
+                    <p>MAF.UI 1.0.0</p>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Framework</label>
+                    <p>.NET 9.0 Blazor Server</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string storagePath = string.Empty;
+    private bool autoSave = true;
+
+    protected override void OnInitialized()
+    {
+        storagePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "MAF.UI",
+            "ChatHistory"
+        );
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void HandleMockModeToggle(ChangeEventArgs e)
+    {
+        var isChecked = (bool)(e.Value ?? false);
+        ChatService.ToggleMockMode(isChecked);
+    }
+
+    private void HandleTestModeToggle(ChangeEventArgs e)
+    {
+        ChatService.Settings.IsTestMode = (bool)(e.Value ?? false);
+    }
+
+    private void HandleModeSwitch(bool isCloudMode)
+    {
+        ChatService.SwitchMode(isCloudMode);
+    }
+
+    private async Task HandleClearHistory()
+    {
+        // TODO: Add confirmation dialog
+        // For now, just navigate back
+        await Task.CompletedTask;
+    }
+
+    private void HandleAutoSaveToggle(ChangeEventArgs e)
+    {
+        autoSave = (bool)(e.Value ?? false);
+    }
+}

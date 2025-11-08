@@ -87,3 +87,88 @@ h1:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.5);
 }
+
+/* Markdown rendering styles */
+.message-text h1, .message-text h2, .message-text h3, .message-text h4, .message-text h5, .message-text h6 {
+    margin: 1rem 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.message-text h1 { font-size: 1.5rem; }
+.message-text h2 { font-size: 1.35rem; }
+.message-text h3 { font-size: 1.2rem; }
+
+.message-text p {
+    margin: 0.75rem 0;
+    line-height: 1.6;
+}
+
+.message-text ul, .message-text ol {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
+}
+
+.message-text li {
+    margin: 0.25rem 0;
+}
+
+.message-text code {
+    padding: 0.125rem 0.375rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.message-text pre {
+    margin: 0.75rem 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 0.5rem;
+    overflow-x: auto;
+}
+
+.message-text pre code {
+    padding: 0;
+    background: none;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.message-text blockquote {
+    margin: 0.75rem 0;
+    padding-left: 1rem;
+    border-left: 3px solid rgba(107, 114, 128, 0.7);
+    color: #9ca3af;
+}
+
+.message-text a {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+.message-text a:hover {
+    color: #93c5fd;
+}
+
+.message-text table {
+    margin: 0.75rem 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.message-text th, .message-text td {
+    padding: 0.5rem;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.message-text th {
+    background: rgba(55, 65, 81, 0.5);
+    font-weight: 600;
+}
+
+.message-text hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid rgba(75, 85, 99, 0.3);
+}
