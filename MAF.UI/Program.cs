@@ -10,6 +10,7 @@ builder.Services.AddRazorComponents()
 // Add custom services
 builder.Services.AddSingleton<ChatStorageService>();
 builder.Services.AddSingleton<MarkdownService>();
+builder.Services.AddSingleton<AdaptiveCardService>();
 builder.Services.AddSingleton<ChatService>();
 
 var app = builder.Build();

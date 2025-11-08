@@ -10,14 +10,16 @@ public class ChatService
     private ChatSession? _currentSession;
     private readonly ChatStorageService _storageService;
     private readonly MarkdownService _markdownService;
+    private readonly AdaptiveCardService _adaptiveCardService;
     private AgentService? _agentService;
 
     public event Action? OnChange;
 
-    public ChatService(ChatStorageService storageService, MarkdownService markdownService)
+    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService)
     {
         _storageService = storageService;
         _markdownService = markdownService;
+        _adaptiveCardService = adaptiveCardService;
         
         // Initialize available agents
         InitializeAgents();
@@ -29,6 +31,8 @@ public class ChatService
     public AppSettings Settings => _settings;
     
     public MarkdownService Markdown => _markdownService;
+    
+    public AdaptiveCardService AdaptiveCard => _adaptiveCardService;
 
     private void InitializeAgents()
     {
@@ -245,10 +249,24 @@ public class ChatService
             
             var aiResponse = new ChatMessage
             {
-                Content = GenerateMockResponse(content),
                 IsUser = false,
                 Timestamp = DateTime.Now
             };
+            
+            // Check if user is asking for an adaptive card or specific keywords
+            if (content.ToLower().Contains("adaptive card") || 
+                content.ToLower().Contains("card") ||
+                content.ToLower().Contains("weather") ||
+                content.ToLower().Contains("status") ||
+                content.ToLower().Contains("profile"))
+            {
+                aiResponse.AdaptiveCardJson = GenerateMockAdaptiveCard(content);
+                aiResponse.Content = "Here's the information you requested:";
+            }
+            else
+            {
+                aiResponse.Content = GenerateMockResponse(content);
+            }
 
             _currentSession.Messages.Add(aiResponse);
             _currentSession.LastMessageAt = DateTime.Now;
@@ -321,6 +339,235 @@ public class ChatService
         };
 
         return responses[new Random().Next(responses.Length)];
+    }
+
+    private string GenerateMockAdaptiveCard(string userMessage)
+    {
+        // Generate different types of adaptive cards based on the user's message
+        if (userMessage.ToLower().Contains("weather"))
+        {
+            return @"{
+                ""type"": ""AdaptiveCard"",
+                ""version"": ""1.5"",
+                ""body"": [
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""Seattle Weather"",
+                        ""size"": ""Large"",
+                        ""weight"": ""Bolder""
+                    },
+                    {
+                        ""type"": ""ColumnSet"",
+                        ""columns"": [
+                            {
+                                ""type"": ""Column"",
+                                ""width"": ""auto"",
+                                ""items"": [
+                                    {
+                                        ""type"": ""Image"",
+                                        ""url"": ""https://adaptivecards.io/content/weather-sunny.png"",
+                                        ""size"": ""Small""
+                                    }
+                                ]
+                            },
+                            {
+                                ""type"": ""Column"",
+                                ""width"": ""stretch"",
+                                ""items"": [
+                                    {
+                                        ""type"": ""TextBlock"",
+                                        ""text"": ""72°F"",
+                                        ""size"": ""ExtraLarge""
+                                    },
+                                    {
+                                        ""type"": ""TextBlock"",
+                                        ""text"": ""Partly Cloudy"",
+                                        ""spacing"": ""None""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        ""type"": ""FactSet"",
+                        ""facts"": [
+                            {
+                                ""title"": ""Humidity"",
+                                ""value"": ""65%""
+                            },
+                            {
+                                ""title"": ""Wind"",
+                                ""value"": ""8 mph NW""
+                            },
+                            {
+                                ""title"": ""Visibility"",
+                                ""value"": ""10 mi""
+                            }
+                        ]
+                    }
+                ]
+            }";
+        }
+        else if (userMessage.ToLower().Contains("status") || userMessage.ToLower().Contains("project"))
+        {
+            return @"{
+                ""type"": ""AdaptiveCard"",
+                ""version"": ""1.5"",
+                ""body"": [
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""Project Status Update"",
+                        ""size"": ""Large"",
+                        ""weight"": ""Bolder""
+                    },
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""MAF Assistants Development"",
+                        ""color"": ""Accent"",
+                        ""spacing"": ""None""
+                    },
+                    {
+                        ""type"": ""FactSet"",
+                        ""facts"": [
+                            {
+                                ""title"": ""Status"",
+                                ""value"": ""In Progress""
+                            },
+                            {
+                                ""title"": ""Completion"",
+                                ""value"": ""75%""
+                            },
+                            {
+                                ""title"": ""Next Milestone"",
+                                ""value"": ""Q1 2025""
+                            },
+                            {
+                                ""title"": ""Team Members"",
+                                ""value"": ""5""
+                            }
+                        ]
+                    },
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""Recent achievements: Adaptive Card support, Mock mode, Chat UI improvements"",
+                        ""wrap"": true,
+                        ""spacing"": ""Medium""
+                    }
+                ],
+                ""actions"": [
+                    {
+                        ""type"": ""Action.OpenUrl"",
+                        ""title"": ""View Details"",
+                        ""url"": ""https://github.com/pkbullock/maf-assistants""
+                    }
+                ]
+            }";
+        }
+        else if (userMessage.ToLower().Contains("profile"))
+        {
+            return @"{
+                ""type"": ""AdaptiveCard"",
+                ""version"": ""1.5"",
+                ""body"": [
+                    {
+                        ""type"": ""ColumnSet"",
+                        ""columns"": [
+                            {
+                                ""type"": ""Column"",
+                                ""width"": ""auto"",
+                                ""items"": [
+                                    {
+                                        ""type"": ""Image"",
+                                        ""url"": ""https://adaptivecards.io/content/logo-256.png"",
+                                        ""size"": ""Small"",
+                                        ""style"": ""Person""
+                                    }
+                                ]
+                            },
+                            {
+                                ""type"": ""Column"",
+                                ""width"": ""stretch"",
+                                ""items"": [
+                                    {
+                                        ""type"": ""TextBlock"",
+                                        ""text"": ""MAF Assistant"",
+                                        ""weight"": ""Bolder"",
+                                        ""size"": ""Large""
+                                    },
+                                    {
+                                        ""type"": ""TextBlock"",
+                                        ""text"": ""AI-Powered Development Assistant"",
+                                        ""spacing"": ""None""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        ""type"": ""FactSet"",
+                        ""facts"": [
+                            {
+                                ""title"": ""Version"",
+                                ""value"": ""1.0.0""
+                            },
+                            {
+                                ""title"": ""Framework"",
+                                ""value"": "".NET 9.0""
+                            },
+                            {
+                                ""title"": ""UI"",
+                                ""value"": ""Blazor Server""
+                            }
+                        ]
+                    }
+                ]
+            }";
+        }
+        else
+        {
+            // Default card
+            return @"{
+                ""type"": ""AdaptiveCard"",
+                ""version"": ""1.5"",
+                ""body"": [
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""Adaptive Card Example"",
+                        ""size"": ""Large"",
+                        ""weight"": ""Bolder""
+                    },
+                    {
+                        ""type"": ""TextBlock"",
+                        ""text"": ""This is a sample adaptive card response in mock mode."",
+                        ""wrap"": true
+                    },
+                    {
+                        ""type"": ""FactSet"",
+                        ""facts"": [
+                            {
+                                ""title"": ""Feature"",
+                                ""value"": ""Adaptive Cards""
+                            },
+                            {
+                                ""title"": ""Status"",
+                                ""value"": ""Active""
+                            },
+                            {
+                                ""title"": ""Mode"",
+                                ""value"": ""Mock""
+                            }
+                        ]
+                    }
+                ],
+                ""actions"": [
+                    {
+                        ""type"": ""Action.OpenUrl"",
+                        ""title"": ""Learn More"",
+                        ""url"": ""https://adaptivecards.io""
+                    }
+                ]
+            }";
+        }
     }
 
     private void CreateSampleSessions()
