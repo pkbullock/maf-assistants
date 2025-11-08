@@ -26,6 +26,7 @@ The application includes a fully functional mock mode that:
 - Conversation starter prompts
 - Enter to send, Shift+Enter for new line
 - Real-time message updates via SignalR
+- Adaptive Cards support for rich, interactive responses
 
 ## Getting Started
 
@@ -84,6 +85,7 @@ MAF.UI/
 │   ├── ChatService.cs                # Chat state management service
 │   ├── ChatStorageService.cs         # Persistent storage service
 │   ├── MarkdownService.cs            # Markdown rendering service
+│   ├── AdaptiveCardService.cs        # Adaptive Cards rendering service
 │   └── AgentService.cs               # AI agent backend service
 ├── wwwroot/
 │   ├── app.css                       # Global styles
@@ -143,14 +145,13 @@ The file upload feature allows users to:
 - [x] Add markdown rendering for AI responses
 - [x] Add code syntax highlighting via CSS
 - [x] Add export chat functionality
+- [x] Add Adaptive Cards support for rich responses
 
 ## Future Enhancements
 
 - [ ] Full MAF.Assistants backend integration (requires API exposure)
 - [ ] Add authentication and user management
-- [ ] Add markdown rendering for AI responses
-- [ ] Add code syntax highlighting
-- [ ] Add export chat functionality
+- [ ] Enhanced Adaptive Cards features (input elements, interactive actions)
 
 ## Technology Stack
 

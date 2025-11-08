@@ -44,11 +44,13 @@ Library for Microsoft Agent Framework Assistants
   - Mock mode for development
   - Conversation starters and chat history
   - Real-time message updates via SignalR
+  - Adaptive Cards support for rich responses
   - See MAF.UI project for details
 
 ## Detailed Documentation
 
 For detailed documentation, see
+    - [ADAPTIVE_CARDS.md](docs/ADAPTIVE_CARDS.md)
     - [GRAPH_INTEGRATION.md](docs/GRAPH_INTEGRATION.md)
     - [RSS_READER.md](docs/RSS_READER.md)
 
