@@ -7,33 +7,79 @@
 
 <div class="nav-menu">
     <div class="nav-header">
-        <button class="new-chat-button" @onclick="HandleNewChat">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            New Chat
-        </button>
+        <div class="new-chat-wrapper">
+            <button class="new-chat-button" @onclick="HandleNewChat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                New Chat
+            </button>
+            <button class="agent-dropdown-toggle" @onclick="ToggleAgentDropdown" title="Select Agent">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        @if (showAgentDropdown)
+        {
+            <div class="agent-dropdown">
+                @foreach (var agent in availableAgents)
+                {
+                    <button class="agent-option" @onclick="() => HandleNewChatWithAgent(agent.Id)">
+                        <span class="agent-icon">@agent.IconEmoji</span>
+                        <div class="agent-info">
+                            <div class="agent-name">@agent.Name</div>
+                            <div class="agent-description">@agent.Description</div>
+                        </div>
+                    </button>
+                }
+            </div>
+        }
     </div>
 
     <div class="nav-scrollable">
         <div class="nav-section">
-            <h3 class="section-title">Chat History</h3>
-            @if (sessions.Any())
+            <div class="section-header" @onclick="ToggleChatHistory">
+                <h3 class="section-title">
+                    <svg class="collapse-icon @(isChatHistoryCollapsed ? "collapsed" : "")" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Chat History
+                </h3>
+            </div>
+            
+            @if (!isChatHistoryCollapsed)
             {
-                @foreach (var session in sessions)
+                @if (sessions.Any())
                 {
-                    <button class="chat-item @(currentSession?.Id == session.Id ? "active" : "")" 
-                            @onclick="() => HandleSelectSession(session.Id)">
-                        <div class="chat-item-content">
-                            <div class="chat-title">@session.Title</div>
-                            <div class="chat-date">@FormatDate(session.LastMessageAt)</div>
+                    @foreach (var session in sessions)
+                    {
+                        <div class="chat-item-wrapper @(currentSession?.Id == session.Id ? "active" : "")">
+                            <button class="chat-item" 
+                                    @onclick="() => HandleSelectSession(session.Id)">
+                                <div class="chat-item-content">
+                                    <div class="chat-title">@session.Title</div>
+                                    <div class="chat-meta">
+                                        <span class="chat-agent">@session.AgentName</span>
+                                        <span class="chat-date">@FormatDate(session.LastMessageAt)</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="delete-button" @onclick="() => HandleDeleteSession(session.Id)" 
+                                    @onclick:stopPropagation="true" title="Delete chat">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" 
+                                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
                         </div>
-                    </button>
+                    }
                 }
-            }
-            else
-            {
-                <div class="empty-state">No chat history</div>
+                else
+                {
+                    <div class="empty-state">No chat history</div>
+                }
             }
         </div>
     </div>
@@ -52,10 +98,14 @@
 @code {
     private List<ChatSession> sessions = new();
     private ChatSession? currentSession;
+    private List<Agent> availableAgents = new();
+    private bool showAgentDropdown = false;
+    private bool isChatHistoryCollapsed = false;
 
     protected override void OnInitialized()
     {
         LoadSessions();
+        availableAgents = ChatService.GetAvailableAgents();
         ChatService.OnChange += OnChatServiceChanged;
     }
 
@@ -76,9 +126,27 @@
         StateHasChanged();
     }
 
+    private void ToggleAgentDropdown()
+    {
+        showAgentDropdown = !showAgentDropdown;
+    }
+
+    private void ToggleChatHistory()
+    {
+        isChatHistoryCollapsed = !isChatHistoryCollapsed;
+    }
+
     private void HandleNewChat()
     {
+        showAgentDropdown = false;
         ChatService.CreateNewSession();
+        Navigation.NavigateTo("/", forceLoad: false);
+    }
+
+    private void HandleNewChatWithAgent(string agentId)
+    {
+        showAgentDropdown = false;
+        ChatService.CreateNewSession(agentId);
         Navigation.NavigateTo("/", forceLoad: false);
     }
 
@@ -86,6 +154,11 @@
     {
         ChatService.SetCurrentSession(sessionId);
         Navigation.NavigateTo("/", forceLoad: false);
+    }
+
+    private void HandleDeleteSession(string sessionId)
+    {
+        ChatService.DeleteSession(sessionId);
     }
 
     private string FormatDate(DateTime date)

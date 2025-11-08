@@ -5,6 +5,7 @@ namespace MAF.UI.Services;
 public class ChatService
 {
     private readonly List<ChatSession> _sessions = new();
+    private readonly List<Agent> _agents = new();
     private readonly AppSettings _settings = new();
     private ChatSession? _currentSession;
     private readonly ChatStorageService _storageService;
@@ -18,6 +19,9 @@ public class ChatService
         _storageService = storageService;
         _markdownService = markdownService;
         
+        // Initialize available agents
+        InitializeAgents();
+        
         // Load saved sessions
         _ = LoadSessionsAsync();
     }
@@ -25,6 +29,44 @@ public class ChatService
     public AppSettings Settings => _settings;
     
     public MarkdownService Markdown => _markdownService;
+
+    private void InitializeAgents()
+    {
+        _agents.Add(new Agent
+        {
+            Id = "default",
+            Name = "General Assistant",
+            Description = "A helpful AI assistant for general queries",
+            IconEmoji = "🤖",
+            IsDefault = true
+        });
+        
+        _agents.Add(new Agent
+        {
+            Id = "code-expert",
+            Name = "Code Expert",
+            Description = "Specialized in programming and software development",
+            IconEmoji = "💻"
+        });
+        
+        _agents.Add(new Agent
+        {
+            Id = "data-analyst",
+            Name = "Data Analyst",
+            Description = "Expert in data analysis and visualization",
+            IconEmoji = "📊"
+        });
+        
+        _agents.Add(new Agent
+        {
+            Id = "writer",
+            Name = "Content Writer",
+            Description = "Specialized in creative and technical writing",
+            IconEmoji = "✍️"
+        });
+    }
+
+    public List<Agent> GetAvailableAgents() => _agents;
 
     private async Task LoadSessionsAsync()
     {
@@ -117,18 +159,48 @@ public class ChatService
 
     public ChatSession? GetCurrentSession() => _currentSession;
 
-    public ChatSession CreateNewSession()
+    public ChatSession CreateNewSession(string? agentId = null)
     {
+        var agent = string.IsNullOrEmpty(agentId) 
+            ? _agents.FirstOrDefault(a => a.IsDefault) ?? _agents.First()
+            : _agents.FirstOrDefault(a => a.Id == agentId) ?? _agents.First();
+        
         var session = new ChatSession
         {
             Title = "New Chat",
             CreatedAt = DateTime.Now,
-            LastMessageAt = DateTime.Now
+            LastMessageAt = DateTime.Now,
+            AgentId = agent.Id,
+            AgentName = agent.Name
         };
         _sessions.Add(session);
         _currentSession = session;
+        
+        // Save immediately after creating
+        _ = SaveSessionsAsync();
+        
         NotifyStateChanged();
         return session;
+    }
+
+    public void DeleteSession(string sessionId)
+    {
+        var session = _sessions.FirstOrDefault(s => s.Id == sessionId);
+        if (session != null)
+        {
+            _sessions.Remove(session);
+            
+            // If we deleted the current session, clear it
+            if (_currentSession?.Id == sessionId)
+            {
+                _currentSession = null;
+            }
+            
+            // Save after deleting
+            _ = SaveSessionsAsync();
+            
+            NotifyStateChanged();
+        }
     }
 
     public void SetCurrentSession(string sessionId)

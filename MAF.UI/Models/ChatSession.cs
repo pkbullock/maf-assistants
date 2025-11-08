@@ -7,4 +7,6 @@ public class ChatSession
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime LastMessageAt { get; set; } = DateTime.Now;
     public List<ChatMessage> Messages { get; set; } = new();
+    public string AgentId { get; set; } = string.Empty;
+    public string AgentName { get; set; } = "Default Agent";
 }

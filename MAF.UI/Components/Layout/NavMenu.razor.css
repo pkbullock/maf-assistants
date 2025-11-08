@@ -8,10 +8,16 @@
 .nav-header {
     padding: 1rem;
     border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    position: relative;
+}
+
+.new-chat-wrapper {
+    display: flex;
+    gap: 0.5rem;
 }
 
 .new-chat-button {
-    width: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -29,6 +35,79 @@
 
 .new-chat-button:hover {
     background: #1d4ed8;
+}
+
+.agent-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background: #2563eb;
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.agent-dropdown-toggle:hover {
+    background: #1d4ed8;
+}
+
+.agent-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 1rem;
+    right: 1rem;
+    background: #1f2937;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    z-index: 100;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.agent-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.agent-option:hover {
+    background: rgba(55, 65, 81, 0.7);
+}
+
+.agent-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.agent-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.agent-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #e5e7eb;
+    margin-bottom: 0.125rem;
+}
+
+.agent-description {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .nav-scrollable {
@@ -58,7 +137,15 @@
     padding: 0 0.75rem;
 }
 
+.section-header {
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
 .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
     color: #9ca3af;
@@ -67,11 +154,30 @@
     margin: 0 0 0.75rem 0.5rem;
 }
 
+.collapse-icon {
+    transition: transform 0.2s;
+}
+
+.collapse-icon.collapsed {
+    transform: rotate(-90deg);
+}
+
+.chat-item-wrapper {
+    position: relative;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+
+.chat-item-wrapper.active {
+    background: rgba(37, 99, 235, 0.2);
+}
+
 .chat-item {
-    width: 100%;
+    flex: 1;
     display: block;
     padding: 0.75rem 0.875rem;
-    margin-bottom: 0.25rem;
     background: transparent;
     border: none;
     border-radius: 0.5rem;
@@ -82,13 +188,34 @@
 }
 
 .chat-item:hover {
-    background: rgba(55, 65, 81, 0.5);
+    background: rgba(55, 65, 81, 0.3);
 }
 
-.chat-item.active {
-    background: rgba(37, 99, 235, 0.2);
+.chat-item-wrapper.active .chat-item {
     border-left: 3px solid #2563eb;
     padding-left: calc(0.875rem - 3px);
+}
+
+.delete-button {
+    position: absolute;
+    right: 0.5rem;
+    padding: 0.375rem;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.chat-item-wrapper:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
 }
 
 .chat-item-content {
@@ -105,8 +232,18 @@
     white-space: nowrap;
 }
 
-.chat-date {
+.chat-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.75rem;
+}
+
+.chat-agent {
+    color: #60a5fa;
+}
+
+.chat-date {
     color: #9ca3af;
 }
 
