@@ -53,6 +53,12 @@
                             <div class="message-text">
                                 @((MarkupString)ChatService.Markdown.ConvertToHtml(message.Content))
                             </div>
+                            @if (message.HasAdaptiveCard)
+                            {
+                                <div class="adaptive-card-wrapper">
+                                    @((MarkupString)ChatService.AdaptiveCard.RenderCardToHtml(message.AdaptiveCardJson!))
+                                </div>
+                            }
                         }
                         @if (message.AttachedFiles != null && message.AttachedFiles.Any())
                         {
