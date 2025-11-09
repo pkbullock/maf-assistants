@@ -63,6 +63,9 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .starter-button:hover {

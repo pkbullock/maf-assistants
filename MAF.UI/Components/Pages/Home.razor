@@ -30,7 +30,7 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        @prompt
+                        @prompt.Title
                     </button>
                 }
             </div>
@@ -131,30 +131,25 @@
     private bool isProcessing = false;
     private ElementReference messagesContainer;
     private List<string> attachedFiles = new();
-
-    private readonly string[] conversationStarters = new[]
-    {
-        "Explain quantum computing in simple terms",
-        "Help me write a professional email",
-        "What are the best practices for API design?",
-        "Summarize the key concepts of machine learning"
-    };
+    private List<MAF.UI.Models.StarterPrompt> conversationStarters = new();
 
     protected override void OnInitialized()
     {
         currentSession = ChatService.GetCurrentSession();
+        conversationStarters = ChatService.GetStarterPrompts();
         ChatService.OnChange += OnChatServiceChanged;
     }
 
     private void OnChatServiceChanged()
     {
         currentSession = ChatService.GetCurrentSession();
+        conversationStarters = ChatService.GetStarterPrompts();
         StateHasChanged();
     }
 
-    private async Task HandleStarterClick(string prompt)
+    private async Task HandleStarterClick(MAF.UI.Models.StarterPrompt prompt)
     {
-        inputMessage = prompt;
+        inputMessage = prompt.Prompt;
         await HandleSendMessage();
     }
 
