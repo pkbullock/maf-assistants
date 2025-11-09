@@ -108,6 +108,10 @@ h1:focus {
     padding-left: 1.5rem;
 }
 
+.message-text p + ul, .message-text p + ol {
+    margin-top: 0.25rem;
+}
+
 .message-text li {
     margin: 0.25rem 0;
 }
@@ -171,6 +175,10 @@ h1:focus {
     margin: 1rem 0;
     border: none;
     border-top: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+div.message-text{
+    white-space:initial !important;
 }
 
 /* Adaptive Card Styles */
