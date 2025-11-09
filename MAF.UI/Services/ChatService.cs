@@ -186,6 +186,9 @@ public class ChatService
             ? _agents.FirstOrDefault(a => a.IsDefault) ?? _agents.First()
             : _agents.FirstOrDefault(a => a.Id == agentId) ?? _agents.First();
         
+        // Update the selected agent type to match the agent for the new session
+        _settings.SelectedAgentType = agent.AgentType;
+        
         var session = new ChatSession
         {
             Title = "New Chat",
@@ -227,6 +230,17 @@ public class ChatService
     public void SetCurrentSession(string sessionId)
     {
         _currentSession = _sessions.FirstOrDefault(s => s.Id == sessionId);
+        
+        // Update the selected agent type to match the session's agent
+        if (_currentSession != null)
+        {
+            var agent = _agents.FirstOrDefault(a => a.Id == _currentSession.AgentId);
+            if (agent != null)
+            {
+                _settings.SelectedAgentType = agent.AgentType;
+            }
+        }
+        
         NotifyStateChanged();
     }
 
