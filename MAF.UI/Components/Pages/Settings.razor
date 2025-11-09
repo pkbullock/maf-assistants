@@ -25,22 +25,11 @@
             
             <div class="setting-item">
                 <div class="setting-info">
-                    <label>Mock Mode</label>
-                    <p>Simulate AI responses without backend connection</p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" checked="@ChatService.Settings.IsMockMode" @onchange="HandleMockModeToggle" disabled="@isTogglingMode" />
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="setting-item">
-                <div class="setting-info">
                     <label>Test Mode</label>
-                    <p>Enable testing features and debug information</p>
+                    <p>Simulate AI responses without backend connection and enable testing features</p>
                 </div>
                 <label class="toggle-switch">
-                    <input type="checkbox" checked="@ChatService.Settings.IsTestMode" @onchange="HandleTestModeToggle" />
+                    <input type="checkbox" checked="@ChatService.Settings.IsTestMode" @onchange="HandleTestModeToggle" disabled="@isTogglingMode" />
                     <span class="toggle-slider"></span>
                 </label>
             </div>
@@ -175,7 +164,7 @@
         Navigation.NavigateTo("/");
     }
 
-    private async Task HandleMockModeToggle(ChangeEventArgs e)
+    private async Task HandleTestModeToggle(ChangeEventArgs e)
     {
         var isChecked = (bool)(e.Value ?? false);
         isTogglingMode = true;
@@ -183,18 +172,13 @@
         
         try
         {
-            await ChatService.ToggleMockModeAsync(isChecked);
+            await ChatService.ToggleTestModeAsync(isChecked);
         }
         finally
         {
             isTogglingMode = false;
             StateHasChanged();
         }
-    }
-
-    private void HandleTestModeToggle(ChangeEventArgs e)
-    {
-        ChatService.Settings.IsTestMode = (bool)(e.Value ?? false);
     }
 
     private async Task HandleModeSwitch(bool isCloudMode)
