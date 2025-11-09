@@ -108,6 +108,10 @@ h1:focus {
     padding-left: 1.5rem;
 }
 
+.message-text p + ul, .message-text p + ol {
+    margin-top: 0.25rem;
+}
+
 .message-text li {
     margin: 0.25rem 0;
 }
