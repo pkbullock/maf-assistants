@@ -202,6 +202,45 @@ input:checked + .toggle-slider:before {
     margin-top: 1rem;
 }
 
+.agent-dropdown-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.agent-select {
+    padding: 0.75rem 1rem;
+    background: rgba(55, 65, 81, 0.5);
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 0.5rem;
+    color: #e5e7eb;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 300px;
+}
+
+.agent-select:hover:not(:disabled) {
+    border-color: rgba(107, 114, 128, 0.7);
+}
+
+.agent-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.agent-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.agent-select option {
+    background: #1f2937;
+    color: #e5e7eb;
+    padding: 0.5rem;
+}
+
 .agent-option {
     display: flex;
     align-items: center;
