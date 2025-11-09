@@ -89,6 +89,13 @@
     margin: 0;
 }
 
+.status-message {
+    font-size: 0.875rem;
+    color: #60a5fa;
+    font-style: italic;
+    margin-top: 0.25rem;
+}
+
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -152,8 +159,13 @@ input:checked + .toggle-slider:before {
     transition: all 0.2s;
 }
 
-.mode-selector button:hover {
-    border-color: rgba(107, 114, 128, 0.7);
+.mode-selector button:hover:not(:disabled) {
+  border-color: rgba(107, 114, 128, 0.7);
+}
+
+.mode-selector button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .mode-selector button.active {
@@ -175,4 +187,90 @@ input:checked + .toggle-slider:before {
 .secondary-button:hover {
     background: rgba(239, 68, 68, 0.1);
     border-color: #ef4444;
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Agent Selector Styles */
+.agent-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.agent-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(55, 65, 81, 0.3);
+    border: 2px solid rgba(75, 85, 99, 0.5);
+    border-radius: 0.75rem;
+    color: #e5e7eb;
+    cursor: pointer;
+ transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+    position: relative;
+}
+
+.agent-option:hover:not(:disabled) {
+    background: rgba(55, 65, 81, 0.5);
+    border-color: rgba(107, 114, 128, 0.7);
+    transform: translateY(-2px);
+}
+
+.agent-option:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.agent-option.selected {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: #2563eb;
+}
+
+.agent-icon {
+    font-size: 2rem;
+ line-height: 1;
+    flex-shrink: 0;
+}
+
+.agent-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.agent-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 0.25rem;
+}
+
+.agent-description {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+.selected-indicator {
+    flex-shrink: 0;
+  display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #2563eb;
+    border-radius: 50%;
+    color: white;
+}
+
+.selected-indicator svg {
+    width: 20px;
+height: 20px;
 }

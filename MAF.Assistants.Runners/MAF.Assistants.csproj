@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Agents\" />
     <Folder Include="Services\" />
     <Folder Include="Tools\" />
   </ItemGroup>

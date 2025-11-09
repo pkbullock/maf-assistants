@@ -17,7 +17,7 @@
                 }
             </div>
             <div class="mode-toggle">
-                <button class="cloud-mode-button" @onclick="HandleModeToggle" title="Switch to @(ChatService.Settings.IsCloudMode ? "Local" : "Cloud") Mode">
+                <button class="cloud-mode-button" @onclick="HandleModeToggle" disabled="@isTogglingMode" title="Switch to @(ChatService.Settings.IsCloudMode ? "Local" : "Cloud") Mode">
                     @if (ChatService.Settings.IsCloudMode)
                     {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -50,8 +50,23 @@
 </div>
 
 @code {
-    private void HandleModeToggle()
+    private bool isTogglingMode = false;
+
+    private async Task HandleModeToggle()
     {
-        ChatService.SwitchMode(!ChatService.Settings.IsCloudMode);
+        if (isTogglingMode) return;
+
+        isTogglingMode = true;
+        StateHasChanged();
+        
+        try
+        {
+            await ChatService.SwitchModeAsync(!ChatService.Settings.IsCloudMode);
+        }
+        finally
+        {
+            isTogglingMode = false;
+            StateHasChanged();
+        }
     }
 }

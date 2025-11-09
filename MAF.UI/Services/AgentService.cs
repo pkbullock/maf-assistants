@@ -1,22 +1,34 @@
+using MAF.Assistants.Interfaces;
+using MAF.Assistants.Models;
+using Microsoft.Agents.AI;
+using System.Text;
+
 namespace MAF.UI.Services;
 
 public class AgentService
 {
-    private readonly bool _isCloudMode;
+    private readonly IChatAgentFactory _chatAgentFactory;
+    private readonly AgentConfiguration _configuration;
+    private AIAgent? _aiAgent;
     private bool _isInitialized = false;
 
-    public AgentService(bool isCloudMode = true)
+    public AgentService(IChatAgentFactory chatAgentFactory, bool isCloudMode = true)
+        : this(chatAgentFactory, new AgentConfiguration { IsCloudMode = isCloudMode })
     {
-        _isCloudMode = isCloudMode;
+    }
+
+    public AgentService(IChatAgentFactory chatAgentFactory, AgentConfiguration configuration)
+    {
+        _chatAgentFactory = chatAgentFactory;
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     public void Initialize()
     {
         try
         {
-            // Initialize the agent
-            // Note: Full integration with MAF.Assistants requires more complex setup
-            // This is a placeholder for now
+            // Initialize the AI agent using the factory with the configuration
+            _aiAgent = _chatAgentFactory.CreateChatAgent(_configuration);
             _isInitialized = true;
         }
         catch (Exception ex)
@@ -28,17 +40,22 @@ public class AgentService
 
     public async Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default)
     {
-        if (!_isInitialized)
+        if (!_isInitialized || _aiAgent == null)
         {
             throw new InvalidOperationException("Agent not initialized. Call Initialize() first.");
         }
 
         try
         {
-            // TODO: Integrate with MAF.Assistants for real AI responses
-            // For now, return a placeholder message
-            await Task.Delay(500, cancellationToken);
-            return "This is a placeholder response. Full MAF.Assistants integration coming soon.";
+            // Use the AI agent to get a streaming response and collect it
+            var responseBuilder = new StringBuilder();
+
+            await foreach (var update in _aiAgent.RunStreamingAsync(message).WithCancellation(cancellationToken))
+            {
+                responseBuilder.Append(update);
+            }
+
+            return responseBuilder.ToString();
         }
         catch (Exception ex)
         {

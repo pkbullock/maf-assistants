@@ -1,5 +1,7 @@
 @page "/settings"
 @using MAF.UI.Services
+@using MAF.Assistants.Models
+@using MAF.Assistants.Utilities
 @inject ChatService ChatService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
@@ -27,7 +29,7 @@
                     <p>Simulate AI responses without backend connection</p>
                 </div>
                 <label class="toggle-switch">
-                    <input type="checkbox" checked="@ChatService.Settings.IsMockMode" @onchange="HandleMockModeToggle" />
+                    <input type="checkbox" checked="@ChatService.Settings.IsMockMode" @onchange="HandleMockModeToggle" disabled="@isTogglingMode" />
                     <span class="toggle-slider"></span>
                 </label>
             </div>
@@ -45,21 +47,60 @@
         </div>
 
         <div class="settings-section">
+            <h2>Agent Selection</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Active Agent</label>
+                    <p>Choose the AI agent personality and capabilities</p>
+                </div>
+            </div>
+                
+            <div class="agent-selector">
+                @foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
+                {
+                    var isSelected = ChatService.Settings.SelectedAgentType == agentType;
+                    <button class="agent-option @(isSelected ? "selected" : "")" 
+                        @onclick="() => HandleAgentSelection(agentType)"
+                        disabled="@isTogglingMode">
+                        <div class="agent-icon">@agentType.GetIcon()</div>
+                        <div class="agent-details">
+                            <div class="agent-name">@agentType.GetDisplayName()</div>
+                            <div class="agent-description">@agentType.GetFullDescription()</div>
+                        </div>
+                        @if (isSelected)
+                        {
+                            <div class="selected-indicator">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="settings-section">
             <h2>AI Configuration</h2>
             
             <div class="setting-item">
                 <div class="setting-info">
                     <label>Cloud/Local Mode</label>
                     <p>@(ChatService.Settings.IsCloudMode ? "Using cloud-based AI service" : "Using local AI model")</p>
+                    @if (isTogglingMode)
+                    {
+                        <p class="status-message">Initializing agent...</p>
+                    }
                 </div>
                 <div class="mode-selector">
-                    <button class="@(ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(true)">
+                    <button class="@(ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(true)" disabled="@isTogglingMode">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         Cloud
                     </button>
-                    <button class="@(!ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(false)">
+                    <button class="@(!ChatService.Settings.IsCloudMode ? "active" : "")" @onclick="() => HandleModeSwitch(false)" disabled="@isTogglingMode">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
                             <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -118,6 +159,7 @@
 @code {
     private string storagePath = string.Empty;
     private bool autoSave = true;
+    private bool isTogglingMode = false;
 
     protected override void OnInitialized()
     {
@@ -133,10 +175,21 @@
         Navigation.NavigateTo("/");
     }
 
-    private void HandleMockModeToggle(ChangeEventArgs e)
+    private async Task HandleMockModeToggle(ChangeEventArgs e)
     {
         var isChecked = (bool)(e.Value ?? false);
-        ChatService.ToggleMockMode(isChecked);
+        isTogglingMode = true;
+        StateHasChanged();
+        
+        try
+        {
+            await ChatService.ToggleMockModeAsync(isChecked);
+        }
+        finally
+        {
+            isTogglingMode = false;
+            StateHasChanged();
+        }
     }
 
     private void HandleTestModeToggle(ChangeEventArgs e)
@@ -144,9 +197,22 @@
         ChatService.Settings.IsTestMode = (bool)(e.Value ?? false);
     }
 
-    private void HandleModeSwitch(bool isCloudMode)
+    private async Task HandleModeSwitch(bool isCloudMode)
     {
-        ChatService.SwitchMode(isCloudMode);
+        if (isTogglingMode) return;
+        
+        isTogglingMode = true;
+        StateHasChanged();
+        
+        try
+        {
+            await ChatService.SwitchModeAsync(isCloudMode);
+        }
+        finally
+        {
+            isTogglingMode = false;
+            StateHasChanged();
+        }
     }
 
     private async Task HandleClearHistory()
@@ -159,5 +225,24 @@
     private void HandleAutoSaveToggle(ChangeEventArgs e)
     {
         autoSave = (bool)(e.Value ?? false);
+    }
+
+    private async Task HandleAgentSelection(AgentType agentType)
+    {
+        if (isTogglingMode || ChatService.Settings.SelectedAgentType == agentType) 
+            return;
+        
+        isTogglingMode = true;
+        StateHasChanged();
+        
+        try
+        {
+            await ChatService.SwitchAgentAsync(agentType);
+        }
+        finally
+        {
+            isTogglingMode = false;
+            StateHasChanged();
+        }
     }
 }

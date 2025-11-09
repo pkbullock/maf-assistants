@@ -1,4 +1,8 @@
 using MAF.UI.Models;
+using MAF.Assistants.Interfaces;
+using MAF.Assistants.Models;
+using MAF.Assistants.Utilities;
+using Microsoft.Agents.AI;
 
 namespace MAF.UI.Services;
 
@@ -11,19 +15,21 @@ public class ChatService
     private readonly ChatStorageService _storageService;
     private readonly MarkdownService _markdownService;
     private readonly AdaptiveCardService _adaptiveCardService;
+    private readonly IChatAgentFactory _chatAgentFactory;
     private AgentService? _agentService;
 
     public event Action? OnChange;
 
-    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService)
+    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService, IChatAgentFactory chatAgentFactory)
     {
         _storageService = storageService;
         _markdownService = markdownService;
         _adaptiveCardService = adaptiveCardService;
+        _chatAgentFactory = chatAgentFactory;
         
         // Initialize available agents
         InitializeAgents();
-        
+  
         // Load saved sessions
         _ = LoadSessionsAsync();
     }
@@ -36,38 +42,19 @@ public class ChatService
 
     private void InitializeAgents()
     {
-        _agents.Add(new Agent
+        // Initialize agents based on available AgentTypes
+        foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
         {
-            Id = "default",
-            Name = "General Assistant",
-            Description = "A helpful AI assistant for general queries",
-            IconEmoji = "🤖",
-            IsDefault = true
-        });
-        
-        _agents.Add(new Agent
-        {
-            Id = "code-expert",
-            Name = "Code Expert",
-            Description = "Specialized in programming and software development",
-            IconEmoji = "💻"
-        });
-        
-        _agents.Add(new Agent
-        {
-            Id = "data-analyst",
-            Name = "Data Analyst",
-            Description = "Expert in data analysis and visualization",
-            IconEmoji = "📊"
-        });
-        
-        _agents.Add(new Agent
-        {
-            Id = "writer",
-            Name = "Content Writer",
-            Description = "Specialized in creative and technical writing",
-            IconEmoji = "✍️"
-        });
+            _agents.Add(new Agent
+            {
+                Id = agentType.ToString().ToLower(),
+                Name = agentType.GetDisplayName(),
+                Description = agentType.GetFullDescription(),
+                IconEmoji = agentType.GetIcon(),
+                IsDefault = agentType == AgentType.SimpleChat,
+                AgentType = agentType
+            });
+        }
     }
 
     public List<Agent> GetAvailableAgents() => _agents;
@@ -119,37 +106,44 @@ public class ChatService
         return exportPath;
     }
 
-    public void SwitchMode(bool isCloudMode)
+    public async Task SwitchModeAsync(bool isCloudMode)
     {
         _settings.IsCloudMode = isCloudMode;
         
         // Reinitialize agent service if not in mock mode
         if (!_settings.IsMockMode)
         {
-            InitializeAgent();
+            await InitializeAgentAsync();
         }
         
         NotifyStateChanged();
     }
 
-    public void ToggleMockMode(bool isMockMode)
+    public async Task ToggleMockModeAsync(bool isMockMode)
     {
         _settings.IsMockMode = isMockMode;
         
         if (!isMockMode)
         {
-            InitializeAgent();
+            await InitializeAgentAsync();
         }
         
         NotifyStateChanged();
     }
 
-    private void InitializeAgent()
+    private async Task InitializeAgentAsync()
     {
         try
         {
-            _agentService = new AgentService(_settings.IsCloudMode);
-            _agentService.Initialize();
+            // Create agent with selected type
+            var configuration = new AgentConfiguration
+            {
+                AgentType = _settings.SelectedAgentType,
+                IsCloudMode = _settings.IsCloudMode
+            };
+            
+            _agentService = new AgentService(_chatAgentFactory, configuration);
+            await Task.Run(() => _agentService.Initialize());
         }
         catch (Exception ex)
         {
@@ -157,6 +151,19 @@ public class ChatService
             // Fall back to mock mode if initialization fails
             _settings.IsMockMode = true;
         }
+    }
+    
+    public async Task SwitchAgentAsync(AgentType agentType)
+    {
+        _settings.SelectedAgentType = agentType;
+        
+        // Reinitialize agent service if not in mock mode
+        if (!_settings.IsMockMode)
+        {
+     await InitializeAgentAsync();
+        }
+        
+    NotifyStateChanged();
     }
 
     public List<ChatSession> GetSessions() => _sessions.OrderByDescending(s => s.LastMessageAt).ToList();
