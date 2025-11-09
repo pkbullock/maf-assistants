@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -23,7 +24,14 @@ namespace MAF.Assistants.Agents
             AgentName = "Code Expert",
             Description = "Specialized in programming and software development",
             IconEmoji = "💻",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("Explain the SOLID principles", "Explain the SOLID principles in software development"),
+                new StarterPrompt("How to optimize database queries?", "How can I optimize my database queries for better performance?"),
+                new StarterPrompt("Review this code snippet", "Can you review this code snippet and suggest improvements?"),
+                new StarterPrompt("Best practices for unit testing", "What are the best practices for writing unit tests?")
+            }
         };
 
         /// <summary>

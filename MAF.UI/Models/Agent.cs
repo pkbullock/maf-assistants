@@ -1,4 +1,5 @@
 using MAF.Assistants.Models;
+using System.Collections.Generic;
 
 namespace MAF.UI.Models;
 
@@ -14,4 +15,9 @@ public class Agent
     /// The underlying agent type from MAF.Assistants
     /// </summary>
     public AgentType AgentType { get; set; } = AgentType.SimpleChat;
+    
+    /// <summary>
+    /// Starter prompts for this agent
+    /// </summary>
+    public List<StarterPrompt> StarterPrompts { get; set; } = new();
 }

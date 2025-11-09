@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -23,7 +24,14 @@ namespace MAF.Assistants.Agents
             AgentName = "Content Writer",
             Description = "Specialized in creative and technical writing",
             IconEmoji = "✍️",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("Write a blog post intro", "Help me write an engaging introduction for a blog post about AI"),
+                new StarterPrompt("Improve my writing clarity", "Can you review and improve the clarity of my writing?"),
+                new StarterPrompt("Create social media captions", "Help me create engaging social media captions"),
+                new StarterPrompt("Adapt tone for audience", "How can I adapt this content for a technical audience?")
+            }
         };
 
         /// <summary>

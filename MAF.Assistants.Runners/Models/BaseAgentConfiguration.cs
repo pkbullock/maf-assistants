@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Models
 {
@@ -41,6 +42,11 @@ namespace MAF.Assistants.Models
         /// Default cloud mode setting
         /// </summary>
         public bool DefaultIsCloudMode { get; set; } = true;
+
+        /// <summary>
+        /// Starter prompts to help users begin a conversation with this agent
+        /// </summary>
+        public List<StarterPrompt> StarterPrompts { get; set; } = new();
 
         public BaseAgentConfiguration() { }
 

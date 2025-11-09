@@ -2,7 +2,9 @@ using MAF.UI.Models;
 using MAF.Assistants.Interfaces;
 using MAF.Assistants.Models;
 using MAF.Assistants.Utilities;
+using MAF.Assistants.Factories;
 using Microsoft.Agents.AI;
+using System.Linq;
 
 namespace MAF.UI.Services;
 
@@ -45,6 +47,7 @@ public class ChatService
         // Initialize agents based on available AgentTypes
         foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
         {
+            var config = AgentRegistry.GetDefaultConfiguration(agentType);
             _agents.Add(new Agent
             {
                 Id = agentType.ToString().ToLower(),
@@ -52,12 +55,19 @@ public class ChatService
                 Description = agentType.GetFullDescription(),
                 IconEmoji = agentType.GetIcon(),
                 IsDefault = agentType == AgentType.SimpleChat,
-                AgentType = agentType
+                AgentType = agentType,
+                StarterPrompts = config.StarterPrompts.Select(sp => new UI.Models.StarterPrompt(sp.Title, sp.Prompt)).ToList()
             });
         }
     }
 
     public List<Agent> GetAvailableAgents() => _agents;
+
+    public List<UI.Models.StarterPrompt> GetStarterPrompts()
+    {
+        var currentAgent = _agents.FirstOrDefault(a => a.AgentType == _settings.SelectedAgentType);
+        return currentAgent?.StarterPrompts ?? new List<UI.Models.StarterPrompt>();
+    }
 
     private async Task LoadSessionsAsync()
     {

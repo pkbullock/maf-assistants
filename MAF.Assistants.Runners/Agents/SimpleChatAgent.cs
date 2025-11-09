@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -24,7 +25,14 @@ namespace MAF.Assistants.Agents
             AgentName = "General Assistant",
             Description = "General purpose conversational AI",
             IconEmoji = "🤖",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("Explain quantum computing in simple terms", "Explain quantum computing in simple terms"),
+                new StarterPrompt("Help me write a professional email", "Help me write a professional email"),
+                new StarterPrompt("What are the best practices for API design?", "What are the best practices for API design?"),
+                new StarterPrompt("Summarize the key concepts of machine learning", "Summarize the key concepts of machine learning")
+            }
         };
 
         /// <summary>

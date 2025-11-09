@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -23,7 +24,14 @@ namespace MAF.Assistants.Agents
             AgentName = "Graph Agent",
             Description = "Integrated with Microsoft 365 services",
             IconEmoji = "📁",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("Show my recent emails", "Show me my recent emails from today"),
+                new StarterPrompt("Check my calendar", "What meetings do I have today?"),
+                new StarterPrompt("List OneDrive files", "List the recent files in my OneDrive"),
+                new StarterPrompt("Send an email", "Help me send an email to my team")
+            }
         };
 
         /// <summary>

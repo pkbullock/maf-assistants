@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -23,7 +24,14 @@ namespace MAF.Assistants.Agents
             AgentName = "JokeAI",
             Description = "A funny AI assistant that tells jokes and provides humorous responses",
             IconEmoji = "😄",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("Tell me a programming joke", "Tell me a programming joke"),
+                new StarterPrompt("What's funny about AI?", "What's funny about AI?"),
+                new StarterPrompt("Make me laugh with a tech joke", "Make me laugh with a tech joke"),
+                new StarterPrompt("Give me a witty response about debugging", "Give me a witty response about debugging")
+            }
         };
 
         /// <summary>

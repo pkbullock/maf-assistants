@@ -5,6 +5,7 @@ using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 
 namespace MAF.Assistants.Agents
 {
@@ -23,7 +24,14 @@ namespace MAF.Assistants.Agents
             AgentName = "Data Analyst",
             Description = "Expert in data analysis and visualization",
             IconEmoji = "📊",
-            DefaultIsCloudMode = true
+            DefaultIsCloudMode = true,
+            StarterPrompts = new List<StarterPrompt>
+            {
+                new StarterPrompt("How to visualize sales trends?", "How can I visualize sales trends over time effectively?"),
+                new StarterPrompt("Explain statistical significance", "Explain statistical significance in simple terms"),
+                new StarterPrompt("Best chart for comparing data", "What's the best chart type for comparing categorical data?"),
+                new StarterPrompt("Analyze customer behavior patterns", "How can I analyze customer behavior patterns from data?")
+            }
         };
 
         /// <summary>
