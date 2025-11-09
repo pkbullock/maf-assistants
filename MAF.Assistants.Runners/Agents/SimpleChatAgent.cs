@@ -18,6 +18,7 @@ namespace MAF.Assistants.Agents
         /// </summary>
         public static BaseAgentConfiguration DefaultConfiguration => new BaseAgentConfiguration
         {
+            //TODO: Add Start Prompts for the UI
             AgentType = AgentType.SimpleChat,
             Instructions = "You are a helpful and friendly AI assistant. You provide clear, accurate, and concise responses to user questions.",
             AgentName = "General Assistant",
@@ -50,14 +51,17 @@ namespace MAF.Assistants.Agents
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
+            //TODO: Custom Instructions should be in addtion of, rather than an override to ensure that base functionality isnt overriden.
             string instructions = string.IsNullOrEmpty(configuration.CustomInstructions)
                 ? DefaultConfiguration.Instructions
                 : configuration.CustomInstructions;
 
+            //TODO: The agent name shouldnt be overridable 
             string agentName = string.IsNullOrEmpty(configuration.AgentName)
                 ? DefaultConfiguration.AgentName
                 : configuration.AgentName;
 
+            //TODO: Expand to introduce a block, ie. what if local mode isnt available for this type of agent
             ChatClient client = configuration.IsCloudMode
                 ? Clients.GetAzureChat()
                 : Clients.GetLocalFoundryChat();

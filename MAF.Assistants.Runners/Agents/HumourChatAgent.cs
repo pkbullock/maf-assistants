@@ -58,8 +58,8 @@ namespace MAF.Assistants.Agents
                 ? DefaultConfiguration.AgentName
                 : configuration.AgentName;
 
-            ChatClient client = configuration.IsCloudMode 
-                ? Clients.GetAzureChat() 
+            ChatClient client = configuration.IsCloudMode
+                ? Clients.GetAzureChat()
                 : Clients.GetLocalFoundryChat();
 
             ChatClientAgent agent = client.CreateAIAgent(instructions: instructions, name: agentName);

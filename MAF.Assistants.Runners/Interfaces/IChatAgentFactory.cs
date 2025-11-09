@@ -14,14 +14,14 @@ public interface IChatAgentFactory
     /// <param name="isCloudMode">Whether to use cloud-based (Azure) or local model</param>
     /// <returns>An initialized AI agent</returns>
     AIAgent CreateChatAgent(bool isCloudMode = true);
-    
+
     /// <summary>
     /// Creates a configured AI chat agent based on the provided configuration
     /// </summary>
     /// <param name="configuration">Agent configuration including type, instructions, and settings</param>
     /// <returns>An initialized AI agent</returns>
     AIAgent CreateChatAgent(AgentConfiguration configuration);
-    
+
     /// <summary>
     /// Creates a configured AI chat agent of a specific type
     /// </summary>

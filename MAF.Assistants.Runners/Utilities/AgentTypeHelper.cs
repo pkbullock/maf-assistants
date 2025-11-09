@@ -1,4 +1,4 @@
-using MAF.Assistants.Factories;
+﻿using MAF.Assistants.Factories;
 using MAF.Assistants.Models;
 using System;
 using System.ComponentModel;
@@ -17,10 +17,10 @@ public static class AgentTypeHelper
     /// </summary>
     public static string GetDescription(this AgentType agentType)
     {
-  var field = agentType.GetType().GetField(agentType.ToString());
-     if (field == null) return agentType.ToString();
+        var field = agentType.GetType().GetField(agentType.ToString());
+        if (field == null) return agentType.ToString();
 
- var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
         return attribute?.Description ?? agentType.ToString();
     }
 
@@ -29,16 +29,16 @@ public static class AgentTypeHelper
     /// </summary>
     public static string GetDisplayName(this AgentType agentType)
     {
-      try
+        try
         {
-  var config = AgentRegistry.GetDefaultConfiguration(agentType);
-      return config.AgentName;
+            var config = AgentRegistry.GetDefaultConfiguration(agentType);
+            return config.AgentName;
         }
         catch
         {
-       // Fallback to enum name if configuration not available
-    return agentType.ToString();
-  }
+            // Fallback to enum name if configuration not available
+            return agentType.ToString();
+        }
     }
 
     /// <summary>
@@ -46,18 +46,18 @@ public static class AgentTypeHelper
     /// </summary>
     public static string GetFullDescription(this AgentType agentType)
     {
-try
-    {
-  var config = AgentRegistry.GetDefaultConfiguration(agentType);
-   return config.Description;
+        try
+        {
+            var config = AgentRegistry.GetDefaultConfiguration(agentType);
+            return config.Description;
         }
         catch
-     {
-     // Fallback to description attribute
- var description = GetDescription(agentType);
-   var parts = description.Split('-', 2);
-     return parts.Length > 1 ? parts[1].Trim() : description;
-}
+        {
+            // Fallback to description attribute
+            var description = GetDescription(agentType);
+            var parts = description.Split('-', 2);
+            return parts.Length > 1 ? parts[1].Trim() : description;
+        }
     }
 
     /// <summary>
@@ -65,39 +65,39 @@ try
     /// </summary>
     public static AgentType[] GetAllAgentTypes()
     {
-  return AgentRegistry.GetRegisteredTypes().ToArray();
+        return AgentRegistry.GetRegisteredTypes().ToArray();
     }
 
-  /// <summary>
+    /// <summary>
     /// Gets an emoji icon for the agent type from the agent's default configuration
     /// </summary>
- public static string GetIcon(this AgentType agentType)
+    public static string GetIcon(this AgentType agentType)
     {
         try
-     {
-      var config = AgentRegistry.GetDefaultConfiguration(agentType);
-      return config.IconEmoji;
+        {
+            var config = AgentRegistry.GetDefaultConfiguration(agentType);
+            return config.IconEmoji;
         }
         catch
-   {
-   // Fallback icons if configuration not available
+        {
+            // Fallback icons if configuration not available
             return agentType switch
-       {
-  AgentType.SimpleChat => "??",
-       AgentType.CodeExpert => "??",
-   AgentType.DataAnalyst => "??",
-    AgentType.ContentWriter => "??",
-       AgentType.GraphAgent => "??",
-     _ => "??"
-     };
+            {
+                AgentType.SimpleChat => "🤖",
+                AgentType.CodeExpert => "💻",
+                AgentType.DataAnalyst => "📊",
+                AgentType.ContentWriter => "✍️",
+                AgentType.GraphAgent => "📁",
+                _ => "🤖"
+            };
         }
     }
-    
+
     /// <summary>
     /// Checks if an agent type is available
     /// </summary>
     public static bool IsAvailable(this AgentType agentType)
-{
-    return AgentRegistry.IsRegistered(agentType);
+    {
+        return AgentRegistry.IsRegistered(agentType);
     }
 }

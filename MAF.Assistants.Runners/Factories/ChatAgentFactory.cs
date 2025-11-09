@@ -36,8 +36,8 @@ public class ChatAgentFactory : IChatAgentFactory
     /// <returns>An initialized AI agent</returns>
     public AIAgent CreateChatAgent(AgentType agentType, bool isCloudMode = true)
     {
-   // Use the registry to create the agent with the specific type
- return AgentRegistry.CreateAgent(agentType, isCloudMode);
+        // Use the registry to create the agent with the specific type
+        return AgentRegistry.CreateAgent(agentType, isCloudMode);
     }
 
     /// <summary>
@@ -47,8 +47,8 @@ public class ChatAgentFactory : IChatAgentFactory
     /// <returns>An initialized AI agent</returns>
     public AIAgent CreateChatAgent(AgentConfiguration configuration)
     {
-   if (configuration == null)
-    throw new ArgumentNullException(nameof(configuration));
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
 
         // Use the registry to create the agent with the configuration
         return AgentRegistry.CreateAgent(configuration);
