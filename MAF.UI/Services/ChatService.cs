@@ -110,8 +110,8 @@ public class ChatService
     {
         _settings.IsCloudMode = isCloudMode;
         
-        // Reinitialize agent service if not in mock mode
-        if (!_settings.IsMockMode)
+        // Reinitialize agent service if not in test mode
+        if (!_settings.IsTestMode)
         {
             await InitializeAgentAsync();
         }
@@ -119,11 +119,11 @@ public class ChatService
         NotifyStateChanged();
     }
 
-    public async Task ToggleMockModeAsync(bool isMockMode)
+    public async Task ToggleTestModeAsync(bool isTestMode)
     {
-        _settings.IsMockMode = isMockMode;
+        _settings.IsTestMode = isTestMode;
         
-        if (!isMockMode)
+        if (!isTestMode)
         {
             await InitializeAgentAsync();
         }
@@ -148,8 +148,8 @@ public class ChatService
         catch (Exception ex)
         {
             Console.WriteLine($"Error initializing agent: {ex.Message}");
-            // Fall back to mock mode if initialization fails
-            _settings.IsMockMode = true;
+            // Fall back to test mode if initialization fails
+            _settings.IsTestMode = true;
         }
     }
     
@@ -157,8 +157,8 @@ public class ChatService
     {
         _settings.SelectedAgentType = agentType;
         
-        // Reinitialize agent service if not in mock mode
-        if (!_settings.IsMockMode)
+        // Reinitialize agent service if not in test mode
+        if (!_settings.IsTestMode)
         {
      await InitializeAgentAsync();
         }
@@ -250,7 +250,7 @@ public class ChatService
         _ = SaveSessionsAsync();
 
         // Get AI response
-        if (_settings.IsMockMode)
+        if (_settings.IsTestMode)
         {
             await Task.Delay(500); // Simulate processing time
             
@@ -267,12 +267,12 @@ public class ChatService
                 content.ToLower().Contains("status") ||
                 content.ToLower().Contains("profile"))
             {
-                aiResponse.AdaptiveCardJson = GenerateMockAdaptiveCard(content);
+                aiResponse.AdaptiveCardJson = MockDataProvider.GenerateMockAdaptiveCard(content);
                 aiResponse.Content = "Here's the information you requested:";
             }
             else
             {
-                aiResponse.Content = GenerateMockResponse(content);
+                aiResponse.Content = MockDataProvider.GenerateMockResponse(content);
             }
 
             _currentSession.Messages.Add(aiResponse);
@@ -325,255 +325,13 @@ public class ChatService
             // Agent not initialized
             var errorMessage = new ChatMessage
             {
-                Content = "AI agent is not initialized. Please check your configuration or enable mock mode.",
+                Content = "AI agent is not initialized. Please check your configuration or enable test mode.",
                 IsUser = false,
                 Timestamp = DateTime.Now
             };
             _currentSession.Messages.Add(errorMessage);
             NotifyStateChanged();
             return errorMessage;
-        }
-    }
-
-    private string GenerateMockResponse(string userMessage)
-    {
-        var responses = new[]
-        {
-            $"I understand you're asking about: '{userMessage}'. In mock mode, I can provide simulated responses.",
-            "That's an interesting question! When connected to the backend, I'll be able to provide more detailed answers.",
-            $"Based on your message about '{userMessage}', here's a mock response to help you develop the UI.",
-            "This is a simulated response from the AI assistant in mock mode."
-        };
-
-        return responses[new Random().Next(responses.Length)];
-    }
-
-    private string GenerateMockAdaptiveCard(string userMessage)
-    {
-        // Generate different types of adaptive cards based on the user's message
-        if (userMessage.ToLower().Contains("weather"))
-        {
-            return @"{
-                ""type"": ""AdaptiveCard"",
-                ""version"": ""1.5"",
-                ""body"": [
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""Seattle Weather"",
-                        ""size"": ""Large"",
-                        ""weight"": ""Bolder""
-                    },
-                    {
-                        ""type"": ""ColumnSet"",
-                        ""columns"": [
-                            {
-                                ""type"": ""Column"",
-                                ""width"": ""auto"",
-                                ""items"": [
-                                    {
-                                        ""type"": ""Image"",
-                                        ""url"": ""https://adaptivecards.io/content/weather-sunny.png"",
-                                        ""size"": ""Small""
-                                    }
-                                ]
-                            },
-                            {
-                                ""type"": ""Column"",
-                                ""width"": ""stretch"",
-                                ""items"": [
-                                    {
-                                        ""type"": ""TextBlock"",
-                                        ""text"": ""72°F"",
-                                        ""size"": ""ExtraLarge""
-                                    },
-                                    {
-                                        ""type"": ""TextBlock"",
-                                        ""text"": ""Partly Cloudy"",
-                                        ""spacing"": ""None""
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        ""type"": ""FactSet"",
-                        ""facts"": [
-                            {
-                                ""title"": ""Humidity"",
-                                ""value"": ""65%""
-                            },
-                            {
-                                ""title"": ""Wind"",
-                                ""value"": ""8 mph NW""
-                            },
-                            {
-                                ""title"": ""Visibility"",
-                                ""value"": ""10 mi""
-                            }
-                        ]
-                    }
-                ]
-            }";
-        }
-        else if (userMessage.ToLower().Contains("status") || userMessage.ToLower().Contains("project"))
-        {
-            return @"{
-                ""type"": ""AdaptiveCard"",
-                ""version"": ""1.5"",
-                ""body"": [
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""Project Status Update"",
-                        ""size"": ""Large"",
-                        ""weight"": ""Bolder""
-                    },
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""MAF Assistants Development"",
-                        ""color"": ""Accent"",
-                        ""spacing"": ""None""
-                    },
-                    {
-                        ""type"": ""FactSet"",
-                        ""facts"": [
-                            {
-                                ""title"": ""Status"",
-                                ""value"": ""In Progress""
-                            },
-                            {
-                                ""title"": ""Completion"",
-                                ""value"": ""75%""
-                            },
-                            {
-                                ""title"": ""Next Milestone"",
-                                ""value"": ""Q1 2025""
-                            },
-                            {
-                                ""title"": ""Team Members"",
-                                ""value"": ""5""
-                            }
-                        ]
-                    },
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""Recent achievements: Adaptive Card support, Mock mode, Chat UI improvements"",
-                        ""wrap"": true,
-                        ""spacing"": ""Medium""
-                    }
-                ],
-                ""actions"": [
-                    {
-                        ""type"": ""Action.OpenUrl"",
-                        ""title"": ""View Details"",
-                        ""url"": ""https://github.com/pkbullock/maf-assistants""
-                    }
-                ]
-            }";
-        }
-        else if (userMessage.ToLower().Contains("profile"))
-        {
-            return @"{
-                ""type"": ""AdaptiveCard"",
-                ""version"": ""1.5"",
-                ""body"": [
-                    {
-                        ""type"": ""ColumnSet"",
-                        ""columns"": [
-                            {
-                                ""type"": ""Column"",
-                                ""width"": ""auto"",
-                                ""items"": [
-                                    {
-                                        ""type"": ""Image"",
-                                        ""url"": ""https://adaptivecards.io/content/logo-256.png"",
-                                        ""size"": ""Small"",
-                                        ""style"": ""Person""
-                                    }
-                                ]
-                            },
-                            {
-                                ""type"": ""Column"",
-                                ""width"": ""stretch"",
-                                ""items"": [
-                                    {
-                                        ""type"": ""TextBlock"",
-                                        ""text"": ""MAF Assistant"",
-                                        ""weight"": ""Bolder"",
-                                        ""size"": ""Large""
-                                    },
-                                    {
-                                        ""type"": ""TextBlock"",
-                                        ""text"": ""AI-Powered Development Assistant"",
-                                        ""spacing"": ""None""
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        ""type"": ""FactSet"",
-                        ""facts"": [
-                            {
-                                ""title"": ""Version"",
-                                ""value"": ""1.0.0""
-                            },
-                            {
-                                ""title"": ""Framework"",
-                                ""value"": "".NET 9.0""
-                            },
-                            {
-                                ""title"": ""UI"",
-                                ""value"": ""Blazor Server""
-                            }
-                        ]
-                    }
-                ]
-            }";
-        }
-        else
-        {
-            // Default card
-            return @"{
-                ""type"": ""AdaptiveCard"",
-                ""version"": ""1.5"",
-                ""body"": [
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""Adaptive Card Example"",
-                        ""size"": ""Large"",
-                        ""weight"": ""Bolder""
-                    },
-                    {
-                        ""type"": ""TextBlock"",
-                        ""text"": ""This is a sample adaptive card response in mock mode."",
-                        ""wrap"": true
-                    },
-                    {
-                        ""type"": ""FactSet"",
-                        ""facts"": [
-                            {
-                                ""title"": ""Feature"",
-                                ""value"": ""Adaptive Cards""
-                            },
-                            {
-                                ""title"": ""Status"",
-                                ""value"": ""Active""
-                            },
-                            {
-                                ""title"": ""Mode"",
-                                ""value"": ""Mock""
-                            }
-                        ]
-                    }
-                ],
-                ""actions"": [
-                    {
-                        ""type"": ""Action.OpenUrl"",
-                        ""title"": ""Learn More"",
-                        ""url"": ""https://adaptivecards.io""
-                    }
-                ]
-            }";
         }
     }
 
