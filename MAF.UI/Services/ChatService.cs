@@ -15,6 +15,7 @@ public class ChatService
     private readonly AppSettings _settings = new();
     private ChatSession? _currentSession;
     private readonly ChatStorageService _storageService;
+    private readonly SettingsStorageService _settingsStorageService;
     private readonly MarkdownService _markdownService;
     private readonly AdaptiveCardService _adaptiveCardService;
     private readonly IChatAgentFactory _chatAgentFactory;
@@ -22,9 +23,10 @@ public class ChatService
 
     public event Action? OnChange;
 
-    public ChatService(ChatStorageService storageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService, IChatAgentFactory chatAgentFactory)
+    public ChatService(ChatStorageService storageService, SettingsStorageService settingsStorageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService, IChatAgentFactory chatAgentFactory)
     {
         _storageService = storageService;
+        _settingsStorageService = settingsStorageService;
         _markdownService = markdownService;
         _adaptiveCardService = adaptiveCardService;
         _chatAgentFactory = chatAgentFactory;
@@ -32,8 +34,9 @@ public class ChatService
         // Initialize available agents
         InitializeAgents();
   
-        // Load saved sessions
+        // Load saved sessions and settings
         _ = LoadSessionsAsync();
+        _ = LoadSettingsAsync();
     }
 
     public AppSettings Settings => _settings;
@@ -104,6 +107,36 @@ public class ChatService
         }
     }
 
+    private async Task LoadSettingsAsync()
+    {
+        try
+        {
+            var loadedSettings = await _settingsStorageService.LoadSettingsAsync();
+            if (loadedSettings != null)
+            {
+                _settings.IsCloudMode = loadedSettings.IsCloudMode;
+                _settings.IsTestMode = loadedSettings.IsTestMode;
+                _settings.SelectedAgentType = loadedSettings.SelectedAgentType;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading settings: {ex.Message}");
+        }
+    }
+
+    public async Task SaveSettingsAsync()
+    {
+        try
+        {
+            await _settingsStorageService.SaveSettingsAsync(_settings);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving settings: {ex.Message}");
+        }
+    }
+
     public async Task<string> ExportChatAsync(string sessionId, string exportPath)
     {
         var session = _sessions.FirstOrDefault(s => s.Id == sessionId);
@@ -120,6 +153,9 @@ public class ChatService
     {
         _settings.IsCloudMode = isCloudMode;
         
+        // Save settings
+        await SaveSettingsAsync();
+        
         // Reinitialize agent service if not in test mode
         if (!_settings.IsTestMode)
         {
@@ -132,6 +168,9 @@ public class ChatService
     public async Task ToggleTestModeAsync(bool isTestMode)
     {
         _settings.IsTestMode = isTestMode;
+        
+        // Save settings
+        await SaveSettingsAsync();
         
         if (!isTestMode)
         {
@@ -167,13 +206,16 @@ public class ChatService
     {
         _settings.SelectedAgentType = agentType;
         
+        // Save settings
+        await SaveSettingsAsync();
+        
         // Reinitialize agent service if not in test mode
         if (!_settings.IsTestMode)
         {
-     await InitializeAgentAsync();
+            await InitializeAgentAsync();
         }
         
-    NotifyStateChanged();
+        NotifyStateChanged();
     }
 
     public List<ChatSession> GetSessions() => _sessions.OrderByDescending(s => s.LastMessageAt).ToList();
@@ -182,12 +224,21 @@ public class ChatService
 
     public ChatSession CreateNewSession(string? agentId = null)
     {
-        var agent = string.IsNullOrEmpty(agentId) 
-            ? _agents.FirstOrDefault(a => a.IsDefault) ?? _agents.First()
-            : _agents.FirstOrDefault(a => a.Id == agentId) ?? _agents.First();
+        Agent agent;
         
-        // Update the selected agent type to match the agent for the new session
-        _settings.SelectedAgentType = agent.AgentType;
+        if (string.IsNullOrEmpty(agentId))
+        {
+            // Use the currently selected agent type from settings as default
+            agent = _agents.FirstOrDefault(a => a.AgentType == _settings.SelectedAgentType) 
+                    ?? _agents.FirstOrDefault(a => a.IsDefault) 
+                    ?? _agents.First();
+        }
+        else
+        {
+            agent = _agents.FirstOrDefault(a => a.Id == agentId) ?? _agents.First();
+            // Update the selected agent type to match the agent for the new session
+            _settings.SelectedAgentType = agent.AgentType;
+        }
         
         var session = new ChatSession
         {

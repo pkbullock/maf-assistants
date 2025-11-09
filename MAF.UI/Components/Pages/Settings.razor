@@ -38,35 +38,19 @@
         <div class="settings-section">
             <h2>Agent Selection</h2>
             
-            <div class="setting-item">
+            <div class="setting-item-vertical">
                 <div class="setting-info">
-                    <label>Active Agent</label>
-                    <p>Choose the AI agent personality and capabilities</p>
+                    <label>Default Agent</label>
+                    <p>Choose the AI agent personality and capabilities for new chats</p>
                 </div>
-            </div>
-                
-            <div class="agent-selector">
-                @foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
-                {
-                    var isSelected = ChatService.Settings.SelectedAgentType == agentType;
-                    <button class="agent-option @(isSelected ? "selected" : "")" 
-                        @onclick="() => HandleAgentSelection(agentType)"
-                        disabled="@isTogglingMode">
-                        <div class="agent-icon">@agentType.GetIcon()</div>
-                        <div class="agent-details">
-                            <div class="agent-name">@agentType.GetDisplayName()</div>
-                            <div class="agent-description">@agentType.GetFullDescription()</div>
-                        </div>
-                        @if (isSelected)
+                <div class="agent-dropdown-wrapper">
+                    <select class="agent-select" @onchange="HandleAgentDropdownChange" disabled="@isTogglingMode" value="@ChatService.Settings.SelectedAgentType">
+                        @foreach (var agentType in AgentTypeHelper.GetAllAgentTypes())
                         {
-                            <div class="selected-indicator">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
+                            <option value="@agentType">@agentType.GetIcon() @agentType.GetDisplayName() - @agentType.GetFullDescription()</option>
                         }
-                    </button>
-                }
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -139,6 +123,16 @@
                 <div class="setting-info">
                     <label>Framework</label>
                     <p>.NET 9.0 Blazor Server</p>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label>Created by</label>
+                    <p>
+                        Paul Bullock - <a href="https://pkbullock.com" target="_blank">pkbullock.com</a><br />
+                        and credit to GitHub Copilot for all the help with coding!
+                    </p>
                 </div>
             </div>
         </div>
@@ -227,6 +221,16 @@
         {
             isTogglingMode = false;
             StateHasChanged();
+        }
+    }
+
+    private async Task HandleAgentDropdownChange(ChangeEventArgs e)
+    {
+        if (e.Value == null || isTogglingMode) return;
+        
+        if (Enum.TryParse<AgentType>(e.Value.ToString(), out var agentType))
+        {
+            await HandleAgentSelection(agentType);
         }
     }
 }
