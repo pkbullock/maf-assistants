@@ -9,20 +9,20 @@ using System;
 namespace MAF.Assistants.Agents
 {
     /// <summary>
-    /// Simple chat agent for general purpose conversations
+    /// Humour chat agent specialized in telling jokes and funny responses
     /// </summary>
-    public class SimpleChatAgent : IChatAgent
+    public class HumourChatAgent : IChatAgent
     {
         /// <summary>
-        /// Default configuration for the simple chat agent
+        /// Default configuration for the humour chat agent
         /// </summary>
         public static BaseAgentConfiguration DefaultConfiguration => new BaseAgentConfiguration
         {
-            AgentType = AgentType.SimpleChat,
-            Instructions = "You are a helpful and friendly AI assistant. You provide clear, accurate, and concise responses to user questions.",
-            AgentName = "General Assistant",
-            Description = "General purpose conversational AI",
-            IconEmoji = "🤖",
+            AgentType = AgentType.HumourWriter,
+            Instructions = "You are good at telling jokes. You provide humorous, witty responses while being helpful. You can tell jokes on demand and add humor to your explanations.",
+            AgentName = "JokeAI",
+            Description = "A funny AI assistant that tells jokes and provides humorous responses",
+            IconEmoji = "😄",
             DefaultIsCloudMode = true
         };
 
@@ -58,8 +58,8 @@ namespace MAF.Assistants.Agents
                 ? DefaultConfiguration.AgentName
                 : configuration.AgentName;
 
-            ChatClient client = configuration.IsCloudMode
-                ? Clients.GetAzureChat()
+            ChatClient client = configuration.IsCloudMode 
+                ? Clients.GetAzureChat() 
                 : Clients.GetLocalFoundryChat();
 
             ChatClientAgent agent = client.CreateAIAgent(instructions: instructions, name: agentName);
