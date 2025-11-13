@@ -12,7 +12,7 @@ namespace MAF.Tests.Utility
         {
             var type = typeof(Clients);
             Assert.True(type.IsAbstract && type.IsSealed); // Static classes are abstract and sealed
-            Assert.False(type.IsPublic); // It's internal
+            Assert.True(type.IsPublic);
         }
 
         [Fact]
