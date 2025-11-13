@@ -20,11 +20,11 @@
   <ItemGroup>
     <PackageReference Include="Azure.AI.OpenAI" Version="2.5.0-beta.1" />
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
-    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251016.1" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251112.1" />
     <PackageReference Include="Microsoft.AI.Foundry.Local" Version="0.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Graph" Version="5.79.0" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.96.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="10.0.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
   </ItemGroup>
 
