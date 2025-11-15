@@ -20,7 +20,8 @@ namespace MAF.Assistants.Factories
             { AgentType.CodeExpert, (isCloudMode) => new CodeExpertAgent().CreateChatAgent(isCloudMode) },
             { AgentType.DataAnalyst, (isCloudMode) => new DataAnalystAgent().CreateChatAgent(isCloudMode) },
             { AgentType.ContentWriter, (isCloudMode) => new ContentWriterAgent().CreateChatAgent(isCloudMode) },
-            { AgentType.GraphAgent, (isCloudMode) => new GraphAgent().CreateChatAgent(isCloudMode) }
+            { AgentType.GraphAgent, (isCloudMode) => new GraphAgent().CreateChatAgent(isCloudMode) },
+            { AgentType.SocialMediaAgent, (isCloudMode) => new SocialMediaAgent().CreateChatAgent(isCloudMode) }
         };
 
         private static readonly Dictionary<AgentType, Func<AgentConfiguration, AIAgent>> _configAgentFactories = new()
@@ -30,7 +31,8 @@ namespace MAF.Assistants.Factories
             { AgentType.CodeExpert, (config) => new CodeExpertAgent().CreateChatAgent(config) },
             { AgentType.DataAnalyst, (config) => new DataAnalystAgent().CreateChatAgent(config) },
             { AgentType.ContentWriter, (config) => new ContentWriterAgent().CreateChatAgent(config) },
-            { AgentType.GraphAgent, (config) => new GraphAgent().CreateChatAgent(config) }
+            { AgentType.GraphAgent, (config) => new GraphAgent().CreateChatAgent(config) },
+            { AgentType.SocialMediaAgent, (config) => new SocialMediaAgent().CreateChatAgent(config)   }
         };
 
         /// <summary>
@@ -81,6 +83,7 @@ namespace MAF.Assistants.Factories
                 AgentType.DataAnalyst => DataAnalystAgent.DefaultConfiguration,
                 AgentType.ContentWriter => ContentWriterAgent.DefaultConfiguration,
                 AgentType.GraphAgent => GraphAgent.DefaultConfiguration,
+                AgentType.SocialMediaAgent => SocialMediaAgent.DefaultConfiguration,
                 _ => throw new ArgumentException($"No configuration registered for type: {agentType}", nameof(agentType))
             };
         }
