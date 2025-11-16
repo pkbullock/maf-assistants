@@ -5,6 +5,8 @@ using MAF.Assistants.Utilities;
 using MAF.Assistants.Factories;
 using Microsoft.Agents.AI;
 using System.Linq;
+using System.Threading;
+using System.Text;
 
 namespace MAF.UI.Services;
 
@@ -22,6 +24,12 @@ public class ChatService
     private AgentService? _agentService;
 
     public event Action? OnChange;
+
+    // Cancellation source for the current streaming response
+    private CancellationTokenSource? _currentResponseCts;
+
+    // Indicates whether an agent response is currently streaming
+    public bool IsAgentTyping { get; private set; }
 
     public ChatService(ChatStorageService storageService, SettingsStorageService settingsStorageService, MarkdownService markdownService, AdaptiveCardService adaptiveCardService, IChatAgentFactory chatAgentFactory)
     {
@@ -295,7 +303,7 @@ public class ChatService
         NotifyStateChanged();
     }
 
-    public async Task<ChatMessage> SendMessageAsync(string content, List<string>? attachedFiles = null)
+    public async Task<ChatMessage> SendMessageAsync(string content, List<string>? attachedFiles = null, CancellationToken externalCancellationToken = default)
     {
         if (_currentSession == null)
         {
@@ -361,13 +369,28 @@ public class ChatService
         }
         else if (_agentService != null && _agentService.IsInitialized)
         {
-            // Use real AI agent
+            // Use real AI agent with streaming and debounce
             try
             {
-                var response = await _agentService.SendMessageAsync(content);
+                // Mark typing state
+                IsAgentTyping = true;
+                NotifyStateChanged();
+
+                // Cancel any previous streaming response
+                _currentResponseCts?.Cancel();
+                _currentResponseCts?.Dispose();
+
+                // Link external cancellation token with internal CTS so either can cancel
+                _currentResponseCts = externalCancellationToken == CancellationToken.None
+                    ? new CancellationTokenSource()
+                    : CancellationTokenSource.CreateLinkedTokenSource(externalCancellationToken);
+
+                var token = _currentResponseCts.Token;
+
+                // Create placeholder AI response so UI can show it immediately
                 var aiResponse = new ChatMessage
                 {
-                    Content = response,
+                    Content = string.Empty,
                     IsUser = false,
                     Timestamp = DateTime.Now
                 };
@@ -375,11 +398,61 @@ public class ChatService
                 _currentSession.Messages.Add(aiResponse);
                 _currentSession.LastMessageAt = DateTime.Now;
                 NotifyStateChanged();
-                
+
+                // Debounce settings
+                const int debounceMs = 80; // flush UI every ~80ms
+                const int flushLength = 32; // or when buffered length reaches this
+
+                var responseSb = new StringBuilder();
+                var bufferSb = new StringBuilder();
+                var lastFlush = Environment.TickCount;
+
+                await foreach (var chunk in _agentService.StreamMessageAsync(content, token).WithCancellation(token))
+                {
+                    // Append chunk to buffers
+                    responseSb.Append(chunk);
+                    bufferSb.Append(chunk);
+
+                    var now = Environment.TickCount;
+                    if ((now - lastFlush) >= debounceMs || bufferSb.Length >= flushLength)
+                    {
+                        // Flush buffered content to the message shown in UI
+                        aiResponse.Content = responseSb.ToString();
+                        _currentSession.LastMessageAt = DateTime.Now;
+                        NotifyStateChanged();
+
+                        bufferSb.Clear();
+                        lastFlush = now;
+                    }
+
+                    // Respect cancellation
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                }
+
+                // Final flush
+                aiResponse.Content = responseSb.ToString();
+                _currentSession.LastMessageAt = DateTime.Now;
+                NotifyStateChanged();
+
                 // Save sessions after AI response
                 _ = SaveSessionsAsync();
 
                 return aiResponse;
+            }
+            catch (OperationCanceledException)
+            {
+                var errorMessage = new ChatMessage
+                {
+                    Content = "Response streaming canceled.",
+                    IsUser = false,
+                    Timestamp = DateTime.Now
+                };
+                _currentSession.Messages.Add(errorMessage);
+                NotifyStateChanged();
+                return errorMessage;
             }
             catch (Exception ex)
             {
@@ -393,6 +466,13 @@ public class ChatService
                 _currentSession.Messages.Add(errorMessage);
                 NotifyStateChanged();
                 return errorMessage;
+            }
+            finally
+            {
+                IsAgentTyping = false;
+                NotifyStateChanged();
+                _currentResponseCts?.Dispose();
+                _currentResponseCts = null;
             }
         }
         else
