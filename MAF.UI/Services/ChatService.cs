@@ -93,13 +93,13 @@ public class ChatService
             else
             {
                 // Initialize with sample data for testing if no saved data
-                CreateSampleSessions();
+                _sessions.AddRange(MockDataProvider.CreateSampleSessions());
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading sessions: {ex.Message}");
-            CreateSampleSessions();
+            _sessions.AddRange(MockDataProvider.CreateSampleSessions());
         }
     }
 
@@ -489,50 +489,6 @@ public class ChatService
             return errorMessage;
         }
     }
-
-    private void CreateSampleSessions()
-    {
-        // Add some sample chat history
-        var session1 = new ChatSession
-        {
-            Title = "test",
-            CreatedAt = DateTime.Now.AddDays(-5).AddHours(-10).AddMinutes(-19),
-            LastMessageAt = DateTime.Now.AddDays(-5).AddHours(-10).AddMinutes(-19)
-        };
-        session1.Messages.Add(new ChatMessage { Content = "test", IsUser = true });
-        session1.Messages.Add(new ChatMessage { Content = "This is a test response.", IsUser = false });
-
-        var session2 = new ChatSession
-        {
-            Title = "test",
-            CreatedAt = DateTime.Now.AddDays(-5).AddHours(-9).AddMinutes(-58),
-            LastMessageAt = DateTime.Now.AddDays(-5).AddHours(-9).AddMinutes(-58)
-        };
-        session2.Messages.Add(new ChatMessage { Content = "test", IsUser = true });
-
-        var session3 = new ChatSession
-        {
-            Title = "Explain quantum computing in simple terms",
-            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-15).AddMinutes(-37),
-            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-15).AddMinutes(-37)
-        };
-
-        var session4 = new ChatSession
-        {
-            Title = "Help me write a professional email",
-            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-14).AddMinutes(-40),
-            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-14).AddMinutes(-40)
-        };
-
-        var session5 = new ChatSession
-        {
-            Title = "API design best practices",
-            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-11).AddMinutes(-53),
-            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-11).AddMinutes(-53)
-        };
-
-        _sessions.AddRange(new[] { session1, session2, session3, session4, session5 });
-    }
-
+    
     private void NotifyStateChanged() => OnChange?.Invoke();
 }
