@@ -50,7 +50,14 @@ public class AgentService
             // Use the AI agent to get a streaming response and collect it
             var responseBuilder = new StringBuilder();
 
-            await foreach (var update in _aiAgent.RunStreamingAsync(message).WithCancellation(cancellationToken))
+            //TODO: Opportunity to customize options based on configuration
+            ChatClientAgentRunOptions agentRunOptions = new(new()
+            {
+               MaxOutputTokens = _configuration.DefaultMaxTokens
+            });
+
+           
+            await foreach (var update in _aiAgent.RunStreamingAsync(message, options: agentRunOptions).WithCancellation(cancellationToken))
             {
                 responseBuilder.Append(update);
             }

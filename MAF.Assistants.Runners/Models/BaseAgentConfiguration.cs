@@ -38,6 +38,12 @@ namespace MAF.Assistants.Models
         /// </summary>
         public bool IsAvailable { get; set; } = true;
 
+
+        /// <summary>
+        /// Gets or sets the default maximum number of tokens allowed for an operation.
+        /// </summary>
+        public int DefaultMaxTokens { get; set; } = 4000;
+
         /// <summary>
         /// Default cloud mode setting
         /// </summary>
