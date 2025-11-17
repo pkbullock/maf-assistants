@@ -2,6 +2,7 @@ using MAF.Assistants.Interfaces;
 using MAF.Assistants.Models;
 using Microsoft.Agents.AI;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace MAF.UI.Services;
 
@@ -38,30 +39,40 @@ public class AgentService
         }
     }
 
-    public async Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Streams partial text updates from the AI agent as they are produced.
+    /// </summary>
+    public async IAsyncEnumerable<string> StreamMessageAsync(string message, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (!_isInitialized || _aiAgent == null)
         {
             throw new InvalidOperationException("Agent not initialized. Call Initialize() first.");
         }
 
-        try
+        // Opportunity to customize options based on configuration
+        ChatClientAgentRunOptions agentRunOptions = new(new()
         {
-            // Use the AI agent to get a streaming response and collect it
-            var responseBuilder = new StringBuilder();
+            MaxOutputTokens = _configuration.DefaultMaxTokens
+        });
 
-            await foreach (var update in _aiAgent.RunStreamingAsync(message).WithCancellation(cancellationToken))
-            {
-                responseBuilder.Append(update);
-            }
-
-            return responseBuilder.ToString();
-        }
-        catch (Exception ex)
+        await foreach (var update in _aiAgent.RunStreamingAsync(message, options: agentRunOptions).WithCancellation(cancellationToken))
         {
-            Console.WriteLine($"Error sending message: {ex.Message}");
-            throw;
+            // The update is an AgentRunResponseUpdate; convert to text for UI streaming
+            yield return update?.ToString() ?? string.Empty;
         }
+    }
+
+    /// <summary>
+    /// Compatibility helper that collects the stream into a single string
+    /// </summary>
+    public async Task<string> SendMessageAsync(string message, CancellationToken cancellationToken = default)
+    {
+        var sb = new StringBuilder();
+        await foreach (var chunk in StreamMessageAsync(message, cancellationToken).WithCancellation(cancellationToken))
+        {
+            sb.Append(chunk);
+        }
+        return sb.ToString();
     }
 
     public bool IsInitialized => _isInitialized;

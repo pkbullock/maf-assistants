@@ -1,3 +1,5 @@
+using MAF.UI.Models;
+
 namespace MAF.UI.Services;
 
 /// <summary>
@@ -257,5 +259,58 @@ public static class MockDataProvider
                 ]
             }";
         }
+    }
+
+
+    /// <summary>
+    /// Creates and returns a set of sample chat sessions for demonstration or testing purposes.
+    /// </summary>
+    /// <remarks>This method is intended for use in scenarios where example chat data is needed, such as UI
+    /// previews, automated tests, or initial application setup. The returned sessions include a mix of populated and
+    /// empty message histories to illustrate different states.</remarks>
+    /// <returns>An array of <see cref="ChatSession"/> objects containing predefined sample chat sessions. The array will contain
+    /// five sessions with various titles and message histories.</returns>
+    public static ChatSession[] CreateSampleSessions()
+    {
+        // Add some sample chat history
+        var session1 = new ChatSession
+        {
+            Title = "test",
+            CreatedAt = DateTime.Now.AddDays(-5).AddHours(-10).AddMinutes(-19),
+            LastMessageAt = DateTime.Now.AddDays(-5).AddHours(-10).AddMinutes(-19)
+        };
+        session1.Messages.Add(new ChatMessage { Content = "test", IsUser = true });
+        session1.Messages.Add(new ChatMessage { Content = "This is a test response.", IsUser = false });
+
+        var session2 = new ChatSession
+        {
+            Title = "test",
+            CreatedAt = DateTime.Now.AddDays(-5).AddHours(-9).AddMinutes(-58),
+            LastMessageAt = DateTime.Now.AddDays(-5).AddHours(-9).AddMinutes(-58)
+        };
+        session2.Messages.Add(new ChatMessage { Content = "test", IsUser = true });
+
+        var session3 = new ChatSession
+        {
+            Title = "Explain quantum computing in simple terms",
+            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-15).AddMinutes(-37),
+            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-15).AddMinutes(-37)
+        };
+
+        var session4 = new ChatSession
+        {
+            Title = "Help me write a professional email",
+            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-14).AddMinutes(-40),
+            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-14).AddMinutes(-40)
+        };
+
+        var session5 = new ChatSession
+        {
+            Title = "API design best practices",
+            CreatedAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-11).AddMinutes(-53),
+            LastMessageAt = DateTime.Now.AddMonths(-11).AddDays(-8).AddHours(-11).AddMinutes(-53)
+        };
+
+        return new[] { session1, session2, session3, session4, session5 };
     }
 }

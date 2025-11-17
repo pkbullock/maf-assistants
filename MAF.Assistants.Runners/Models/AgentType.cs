@@ -41,5 +41,8 @@ public enum AgentType
     /// Microsoft Graph agent with access to Microsoft 365 services
     /// </summary>
     [Description("Graph Agent - Integrated with Microsoft 365 services")]
-    GraphAgent = 5
+    GraphAgent = 5,
+
+    [Description("Social Media Agent - Generate Social Media Posts")]
+    SocialMediaAgent = 6
 }
