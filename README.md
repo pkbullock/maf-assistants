@@ -2,6 +2,8 @@
 
 Library for Microsoft Agent Framework Assistants
 
+> Note: This is a work in progress and there are many elements that are not yet fully tested.
+
 ## Agents and Features this repo is planning to achieve
 
 - The agent framework relies on agents, so need a collection of agents.
@@ -75,3 +77,5 @@ The Phi-3 model range does not support tool calling.
 - "FoundryLocalChatDeploymentName": "Phi-4-mini-instruct-generic-cpu:4",
 
 Enabling Function Calling with Phi-4 requires this change: https://github.com/microsoft/Foundry-Local/tree/main/samples/python/functioncalling
+
+> Note: Not yet supported by Foundry Local
