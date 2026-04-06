@@ -11,6 +11,7 @@ public class AgentService
     private readonly IChatAgentFactory _chatAgentFactory;
     private readonly AgentConfiguration _configuration;
     private AIAgent? _aiAgent;
+    private AgentSession? _session;
     private bool _isInitialized = false;
 
     public AgentService(IChatAgentFactory chatAgentFactory, bool isCloudMode = true)
@@ -49,13 +50,16 @@ public class AgentService
             throw new InvalidOperationException("Agent not initialized. Call Initialize() first.");
         }
 
+        // Create session lazily on first use to avoid sync-over-async anti-pattern
+        _session ??= await _aiAgent.CreateSessionAsync(cancellationToken);
+
         // Opportunity to customize options based on configuration
         ChatClientAgentRunOptions agentRunOptions = new(new()
         {
             MaxOutputTokens = _configuration.DefaultMaxTokens
         });
 
-        await foreach (var update in _aiAgent.RunStreamingAsync(message, options: agentRunOptions).WithCancellation(cancellationToken))
+        await foreach (var update in _aiAgent.RunStreamingAsync(message, _session, agentRunOptions).WithCancellation(cancellationToken))
         {
             // The update is an AgentRunResponseUpdate; convert to text for UI streaming
             yield return update?.ToString() ?? string.Empty;

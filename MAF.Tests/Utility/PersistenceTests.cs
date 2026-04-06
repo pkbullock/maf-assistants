@@ -26,10 +26,11 @@ namespace MAF.Tests.Utility
             Assert.Equal(typeof(Task), methodInfo.ReturnType);
             
             var parameters = methodInfo.GetParameters();
-            Assert.Equal(2, parameters.Length);
-            Assert.Equal("thread", parameters[0].Name);
-            Assert.Equal("fileName", parameters[1].Name);
-            Assert.Equal(typeof(string), parameters[1].ParameterType);
+            Assert.Equal(3, parameters.Length);
+            Assert.Equal("agent", parameters[0].Name);
+            Assert.Equal("session", parameters[1].Name);
+            Assert.Equal("fileName", parameters[2].Name);
+            Assert.Equal(typeof(string), parameters[2].ParameterType);
         }
 
         [Fact]
@@ -54,7 +55,7 @@ namespace MAF.Tests.Utility
         {
             var methodInfo = typeof(Persistence).GetMethod("SaveConversationToFileAsync");
             var parameters = methodInfo.GetParameters();
-            var fileNameParam = parameters[1];
+            var fileNameParam = parameters[2];
             
             Assert.True(fileNameParam.HasDefaultValue);
             Assert.Equal("agent_thread.json", fileNameParam.DefaultValue);
