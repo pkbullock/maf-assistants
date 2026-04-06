@@ -36,17 +36,19 @@ namespace MAF.Assistants.Runners
             string agentName = "WeatherAI";
             string prompt = "What is the weather like in Amsterdam?";
 
-            AIAgent agent = client.CreateAIAgent(instructions: modelInstruction, name: agentName, 
+            AIAgent agent = client.AsAIAgent(instructions: modelInstruction, name: agentName, 
                 tools: [AIFunctionFactory.Create(GetWeather, "get_weather", "Gets the current weather for a specified location")])
                 .AsBuilder()
                 .Use(LogFunctionCalling.LogFunctionCallAsync)
                 .Build();
 
+            AgentSession session = await agent.CreateSessionAsync(default);
+
             // Simple Example - Streaming
             // TODO: Move away from console.writeline and use the WriteOut utility class
-            //Console.WriteLine(await agent.RunAsync(prompt));
+            //Console.WriteLine(await agent.RunAsync(prompt, session));
 
-            await foreach (var update in agent.RunStreamingAsync(prompt))
+            await foreach (var update in agent.RunStreamingAsync(prompt, session))
             {
                 Console.Write(update);
             }

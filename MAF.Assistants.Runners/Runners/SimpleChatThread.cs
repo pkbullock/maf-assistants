@@ -27,21 +27,21 @@ namespace MAF.Assistants.Runners
             string agentName = "JokeAI";
             string prompt = "Tell me a joke about a pirate.";
 
-            AIAgent agent = client.CreateAIAgent(instructions: modelInstruction, name: agentName);
+            AIAgent agent = client.AsAIAgent(instructions: modelInstruction, name: agentName);
 
-            AgentThread thread = agent.GetNewThread();
+            AgentSession session = await agent.CreateSessionAsync(default);
 
 
             // Simple Example - Streaming
             // TODO: Move away from console.writeline and use the WriteOut utility class
-            //Console.WriteLine(await agent.RunAsync(prompt));
+            //Console.WriteLine(await agent.RunAsync(prompt, session));
 
-            await foreach (var update in agent.RunStreamingAsync(prompt, thread))
+            await foreach (var update in agent.RunStreamingAsync(prompt, session))
             {
                 Console.Write(update);
             }
 
-            await Persistence.SaveConversationToFileAsync(thread, "simple_chat_thread.json");
+            await Persistence.SaveConversationToFileAsync(agent, session, "simple_chat_thread.json");
         }
 
     }

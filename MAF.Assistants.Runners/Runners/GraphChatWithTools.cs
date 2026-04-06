@@ -47,7 +47,7 @@ Always be clear about what data you're accessing and what actions you're taking.
             string agentName = "Microsoft365Assistant";
             
             // Create the AI agent with Microsoft Graph tools
-            AIAgent agent = client.CreateAIAgent(
+            AIAgent agent = client.AsAIAgent(
                 instructions: modelInstruction, 
                 name: agentName,
                 tools: [
@@ -70,6 +70,8 @@ Always be clear about what data you're accessing and what actions you're taking.
             WriteOut.MsgGrey("Available tools: SharePoint (list sites/lists, get list items, read/write files), Email (read, send)");
             WriteOut.Divider();
 
+            AgentSession session = await agent.CreateSessionAsync(default);
+
             // Interactive chat loop
             WriteOut.MsgCyan("Enter your requests (or type 'exit' to quit):");
             WriteOut.MsgBlankLine();
@@ -89,7 +91,7 @@ Always be clear about what data you're accessing and what actions you're taking.
                 }
 
                 Console.Write("Assistant: ");
-                await foreach (var update in agent.RunStreamingAsync(userInput))
+                await foreach (var update in agent.RunStreamingAsync(userInput, session))
                 {
                     Console.Write(update);
                 }

@@ -70,7 +70,7 @@ namespace MAF.Assistants.Agents
                    ? Clients.GetAzureChat()
                 : Clients.GetLocalFoundryChat();
 
-            ChatClientAgent agent = client.CreateAIAgent(instructions: instructions, name: agentName);
+            ChatClientAgent agent = client.AsAIAgent(instructions: instructions, name: agentName);
 
             return agent;
         }
